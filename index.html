@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>David Dev · Criação de sites para comércios e pessoas em SP</title>
+<title>DavidDevPortifolio · Criação de sites para comércios e pessoas em SP</title>
 <meta name="description" content="Criação de sites rápidos e feitos para o celular, para comércios e profissionais. Prazo por escrito, metade na entrega. Orçamento pelo WhatsApp.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="author" content="David Dev">
@@ -14,16 +14,18 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
-<meta property="og:site_name" content="David Dev">
-<meta property="og:title" content="David Dev · Criação de sites para comércios e pessoas">
+<meta property="og:site_name" content="DavidDevPortifolio">
+<meta property="og:title" content="DavidDevPortifolio · Criação de sites para comércios e pessoas">
 <meta property="og:description" content="Eu construo o seu site, camada por camada. Prazo por escrito, metade na entrega.">
-<!-- DEPLOY STEP: URLs absolutas do site no ar (GitHub Pages) -->
+<!-- DEPLOY STEP: URLs absolutas do site no ar (trocar para https://daviddev.com.br quando o domínio estiver ativo) -->
 <meta property="og:url" content="https://davizzinn.github.io/">
-<meta property="og:image" content="https://davizzinn.github.io/assets/og.jpg">
+<meta property="og:image" content="https://davizzinn.github.io/assets/og-daviddev.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="David Dev: eu construo o seu site, camada por camada.">
+<meta property="og:image:alt" content="DavidDevPortifolio: logo do David Dev e o endereço daviddev.com.br.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DavidDevPortifolio · Criação de sites para comércios e pessoas">
+<meta name="twitter:image" content="https://davizzinn.github.io/assets/og-daviddev.jpg">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -32,7 +34,8 @@
       "@type": "WebSite",
       "@id": "https://davizzinn.github.io/#site",
       "url": "https://davizzinn.github.io/",
-      "name": "David Dev",
+      "name": "DavidDevPortifolio",
+      "alternateName": "David Dev",
       "inLanguage": "pt-BR"
     },
     {
@@ -41,7 +44,7 @@
       "name": "David Dev",
       "description": "Criação de sites para comércios e pessoas: página única, site completo, site animado e loja.",
       "url": "https://davizzinn.github.io/",
-      "image": "https://davizzinn.github.io/assets/og.jpg",
+      "image": "https://davizzinn.github.io/assets/og-daviddev.jpg",
       "logo": "https://davizzinn.github.io/assets/icon-192.png",
       "telephone": "+55 17 99660-4865",
       "priceRange": "R$ 300 a R$ 9.000+",
@@ -92,10 +95,12 @@
 </svg>
 
 <div class="ambient" aria-hidden="true">
-  <div class="aur aur-a"></div>
-  <div class="aur aur-b"></div>
-  <div class="aur aur-c"></div>
-  <div class="aur aur-d"></div>
+  <div class="aurs" id="aurs">
+    <div class="aur aur-a"></div>
+    <div class="aur aur-b"></div>
+    <div class="aur aur-c"></div>
+    <div class="aur aur-d"></div>
+  </div>
   <div class="galaxy" id="galaxy"><i class="gx-glow"></i><i class="gx-dust"></i></div>
   <div class="stars s-far"><i class="st a"></i><i class="st b"></i></div>
   <div class="stars s-mid"><i class="st a"></i><i class="st b"></i></div>
@@ -137,6 +142,8 @@
     <p class="menu-status"><i class="dot" aria-hidden="true"></i>Aberto para projetos</p>
   </div>
 </header>
+
+<button class="motion-toggle" id="motionToggle" type="button" aria-pressed="false"><span class="mt-ico" aria-hidden="true"></span><span class="mt-label">Ver com animações</span></button>
 
 <main id="main" tabindex="-1">
 
@@ -224,43 +231,11 @@
 
     <div class="scrim" aria-hidden="true"></div>
 
-    <div class="bands" id="bands">
-      <div class="band fx-scatter" data-a="0" data-b="0.17" data-spread="0.5">
-        <p class="kick">David Dev · desenvolvedor de sites · SP</p>
-        <h1 class="t">Eu construo o seu site, camada por camada.</h1>
-        <p class="s">Para comércios e pessoas que querem ser encontrados. Role e veja como é feito.</p>
-      </div>
-      <div class="band fx-grid" data-a="0.20" data-b="0.37" data-spread="0.5">
-        <p class="kick">camada 01 · código</p>
-        <p class="t">Primeiro, o código.</p>
-        <p class="s">Escrito à mão, sem gambiarra. Leve para abrir rápido até no 4G.</p>
-      </div>
-      <div class="band fx-drift" data-a="0.40" data-b="0.57">
-        <p class="kick">camadas 02 e 03 · estrutura e design</p>
-        <p class="t">Depois, a estrutura e a cara da sua marca.</p>
-        <p class="s">Cada coisa no lugar certo, com as suas cores. Pensado primeiro para o celular, porque é lá que seu cliente está.</p>
-      </div>
-      <div class="band fx-punch" data-a="0.60" data-b="0.77">
-        <p class="kick">camada 04 · conteúdo</p>
-        <p class="t" data-em="vende.">Por fim, o conteúdo que vende.</p>
-        <p class="s">Texto claro, fotos boas e um botão direto para o seu WhatsApp.</p>
-      </div>
-      <div class="band fx-rise" data-a="0.81" data-b="1">
-        <p class="kick"><i class="dot" aria-hidden="true"></i>no ar</p>
-        <p class="t">No ar. E pronto para o Google.</p>
-        <p class="s">Domínio, celular e Google resolvidos. Você só aprova.</p>
-        <p class="cta-row">
-          <a class="btn magnet" href="https://wa.me/5517996604865" data-wa="Oi David! Vi seu portfólio e quero fazer um site." target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#wa"/></svg>Quero meu site</a>
-          <a class="btn btn-ghost" href="#trabalhos">Ver trabalhos</a>
-        </p>
-      </div>
-    </div>
-
-    <div class="static-copy">
-      <p class="kick">David Dev · desenvolvedor de sites · SP</p>
-      <h1 class="t">Eu construo o seu site, camada por camada.</h1>
-      <p class="s">Sites rápidos, bonitos e feitos para o celular, para comércios e pessoas que querem ser encontrados.</p>
-      <p class="cta-row">
+    <div class="static-copy rv-group">
+      <p class="kick rv">David Dev · desenvolvedor de sites · SP</p>
+      <h1 class="t rv-words">Eu construo o seu site, camada por camada.</h1>
+      <p class="s rv">Sites rápidos, bonitos e feitos para o celular, para comércios e pessoas que querem ser encontrados.</p>
+      <p class="cta-row rv">
         <a class="btn magnet" href="https://wa.me/5517996604865" data-wa="Oi David! Vi seu portfólio e quero fazer um site." target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#wa"/></svg>Quero meu site</a>
         <a class="btn btn-ghost" href="#trabalhos">Ver trabalhos</a>
       </p>
@@ -268,9 +243,9 @@
 
     <div class="hud chip" aria-hidden="true">
       <span class="hud-ticks"><i></i><i></i><i></i><i></i></span>
-      <span class="hud-t">camadas <b id="hudN">0</b>/4</span>
+      <span class="hud-t" id="hudT">As 4 camadas do seu site</span>
     </div>
-    <div class="cue" aria-hidden="true"><span>role para montar</span><i></i></div>
+    <div class="cue" aria-hidden="true"><span>role para ver mais</span><i></i></div>
   </div>
 </section>
 

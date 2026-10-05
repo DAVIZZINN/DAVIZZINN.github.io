@@ -10,95 +10,62 @@
   function rng(seed) { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
 
   const root = document.documentElement;
-  const RM = matchMedia('(prefers-reduced-motion: reduce)');
+  /* ---------- movimento reduzido: respeitado por padrão, com um botão para ligar as animações ---------- */
+  const SYS_RM = matchMedia('(prefers-reduced-motion: reduce)');
+  let forceMotion = false;
+  try { forceMotion = localStorage.getItem('dd-motion') === 'on'; } catch (e) { /* sem armazenamento: fica o padrão */ }
+  const rmListeners = [];
+  const RM = {
+    get matches() { return SYS_RM.matches && !forceMotion; },
+    addEventListener(type, fn) { rmListeners.push(fn); }
+  };
+  const emitRM = () => rmListeners.forEach(fn => fn({ matches: RM.matches }));
+  const motionBtn = $('#motionToggle');
+  function syncMotionUI() {
+    root.classList.toggle('rm-sys', SYS_RM.matches);
+    root.classList.toggle('force-motion', SYS_RM.matches && forceMotion);
+    motionBtn.setAttribute('aria-pressed', String(forceMotion));
+    $('.mt-label', motionBtn).textContent = forceMotion ? 'Menos movimento' : 'Ver com animações';
+  }
+  SYS_RM.addEventListener('change', () => { syncMotionUI(); emitRM(); });
+  motionBtn.addEventListener('click', () => {
+    forceMotion = !forceMotion;
+    try { localStorage.setItem('dd-motion', forceMotion ? 'on' : 'off'); } catch (e) { /* sem armazenamento: vale só nesta visita */ }
+    syncMotionUI();
+    emitRM();
+  });
+  syncMotionUI();
 
   /* ---------- WhatsApp ---------- */
   const WA = 'https://wa.me/5517996604865';
   const waLink = msg => WA + '?text=' + encodeURIComponent(msg);
   $$('[data-wa]').forEach(a => { a.href = waLink(a.dataset.wa); });
 
-  /* ---------- divisão do texto das legendas ---------- */
-  function splitTitle(el, seed, fx, spread) {
-    const text = el.textContent.trim();
-    const em = el.dataset.em || '';
-    el.textContent = '';
-    const sr = document.createElement('span');
-    sr.className = 'sr';
-    sr.textContent = text;
-    const vis = document.createElement('span');
-    vis.setAttribute('aria-hidden', 'true');
-    const r = rng(seed);
-    const words = text.split(' ');
-    const total = text.replace(/ /g, '').length;
-    let ci = 0;
-    words.forEach((word, wi) => {
-      const w = document.createElement('span');
-      w.className = 'w' + (em && word === em ? ' em' : '');
-      w.style.setProperty('--th', (wi / words.length * (fx === 'punch' ? 0.5 : 0.45)).toFixed(3));
-      if (fx === 'scatter' || fx === 'grid') {
-        for (const ch of word) {
-          const c = document.createElement('span');
-          c.className = 'c';
-          c.textContent = ch;
-          if (fx === 'scatter') {
-            c.style.setProperty('--th', (r() * spread).toFixed(3));
-            c.style.setProperty('--jx', ((r() - 0.5) * 90).toFixed(1) + 'px');
-            c.style.setProperty('--jy', ((r() - 0.5) * 64).toFixed(1) + 'px');
-            c.style.setProperty('--jr', ((r() - 0.5) * 70).toFixed(1) + 'deg');
-          } else {
-            c.style.setProperty('--th', (ci / total * spread + r() * 0.06).toFixed(3));
-            c.style.setProperty('--jx', (16 + r() * 12).toFixed(1) + 'px');
-          }
-          ci++;
-          w.appendChild(c);
-        }
-      } else {
-        w.textContent = word;
-      }
-      vis.appendChild(w);
-      if (wi < words.length - 1) vis.appendChild(document.createTextNode(' '));
-    });
-    el.append(sr, vis);
-  }
-
   /* ---------- ponteiro: mouse, caneta e toque ---------- */
   const FINE = matchMedia('(hover: hover) and (pointer: fine)');
   const ptr = { tx: innerWidth / 2, ty: innerHeight * 0.3, x: innerWidth / 2, y: innerHeight * 0.3, cx: 0, cy: 0, tcx: 0, tcy: 0, drag: 0, dragging: false, raf: null, last: 0 };
   const smooth = { on: false };
 
-  /* ---------- hero: a vista explodida ---------- */
+  /* ---------- hero: as camadas se montam sozinhas, em loop, como um vídeo ---------- */
   const hero = $('.hero');
-  const stage = $('.stage');
   const stack = $('#stack');
   const layers = $$('.layer', stack);
   const cue = $('.cue');
-  const hudN = $('#hudN');
+  const hudT = $('#hudT');
   const hudTicks = $$('.hud-ticks i');
-
-  const bands = $$('.band').map((el, i, arr) => ({
-    el, a: +el.dataset.a, b: +el.dataset.b, ramp: +el.dataset.ramp || 0,
-    first: i === 0, last: i === arr.length - 1, op: -1, k: -1, on: null
-  }));
-  bands.forEach((b, i) => {
-    const fx = (b.el.className.match(/fx-(\w+)/) || [])[1];
-    splitTitle($('.t', b.el), 101 + i * 17, fx, +b.el.dataset.spread || 0.5);
-  });
+  // as batidas da história em progresso da cena: guiam os destaques das camadas e o rótulo embaixo
+  const BEATS = [[0, 0.17], [0.2, 0.37], [0.4, 0.57], [0.6, 0.77], [0.81, 1]]
+    .map(([a, b], i, arr) => ({ a, b, first: i === 0, last: i === arr.length - 1 }));
+  const STEP_LABEL = ['As 4 camadas do seu site', 'Camada 01 · código', 'Camadas 02 e 03 · estrutura e design', 'Camada 04 · conteúdo', 'No ar'];
 
   let W = 0, G = 0, shiftX = 0;
   const STACKED = matchMedia('(orientation: portrait) and (max-width: 1100px), (max-width: 600px)');
-  let scrubOn = false, heroOn = true;
-  let target = 0, shown = 0, rafId = null, lastTick = 0;
-  let loadK = 0, loadRaf = null;
-  const sc = { stack: '', type: -1, live: -1, cue: -1, n: -1, label: '', labelAt: 0, L: layers.map(() => ({ t: '', o: -1, hi: -1, ao: -1 })) };
+  let scrubOn = false, heroOn = true, shown = 0;
+  let loopRaf = null, loopClock = 0, loopLast = 0;
+  const sc = { stack: '', type: -1, live: -1, n: -1, step: -1, cue: -1, L: layers.map(() => ({ t: '', o: -1, hi: -1, ao: -1 })) };
 
   // no celular a pilha explodida começa um pouco à direita para os rótulos caberem, e volta ao centro ao assentar
   function measure() { W = stack.offsetWidth; G = W * 0.25; shiftX = STACKED.matches ? W * 0.09 : 0; }
-
-  function heroProgress() {
-    const range = hero.offsetHeight - stage.offsetHeight;
-    if (range <= 0) return 1;
-    return clamp(-hero.getBoundingClientRect().top / range, 0, 1);
-  }
 
   function bandOpacity(b, p) {
     const f = Math.min(0.02, (b.b - b.a) / 3);
@@ -138,7 +105,6 @@
       Math.max(0.35, 1 - 0.62 * o2 - 0.62 * o3)
     ];
     const hi = [o2, o3, o3, o4];
-    const act = [o2, o3, o3, o4];
     // só a camada do topo da pilha mantém o rótulo: ele some quando outra camada pousa em cima
     const free = [1 - land[1], 1 - land[2], 1 - land[3], 1 - sstep(0.565, 0.605, p)];
 
@@ -149,82 +115,65 @@
       const o = opa[i];
       if (Math.abs(o - L.o) > 0.004 || (o !== L.o && (o === 0 || o === 1))) { el.style.opacity = o.toFixed(3); L.o = o; }
       L.hi = setVar(el, '--hi', hi[i], L.hi, 0.01);
-      L.ao = setVar(el, '--ao', annoBase * free[i] * (0.7 + 0.3 * act[i]), L.ao, 0.01);
+      L.ao = setVar(el, '--ao', annoBase * free[i] * (0.7 + 0.3 * hi[i]), L.ao, 0.01);
     });
 
     sc.type = setVar(stack, '--type', lerp(0.32, 1, sstep(0.18, 0.34, p)), sc.type, 0.004);
     sc.live = setVar(stack, '--live', sstep(0.9, 0.98, p), sc.live, 0.01);
-    sc.cue = setVar(cue, '--cue', 1 - sstep(0.01, 0.05, p), sc.cue, 0.01);
 
     const n = p < 0.19 ? 0 : 1 + (land[1] > 0.5) + (land[2] > 0.5) + (land[3] > 0.5);
     if (n !== sc.n) { hudTicks.forEach((tk, i) => tk.classList.toggle('on', i < n)); sc.n = n; }
-    return n;
   }
 
-  function updateLabel(text, now) {
-    if (now - sc.labelAt < 100) return;
-    if (text === sc.label) return;
-    sc.label = text;
-    sc.labelAt = now;
-    hudN.textContent = text;
+  // o rótulo embaixo da cena conta em qual camada o site está
+  function updateStep(ops) {
+    let i = 0;
+    ops.forEach((o, k) => { if (o > ops[i]) i = k; });
+    if (i === sc.step) return;
+    sc.step = i;
+    hudT.classList.remove('swap');
+    void hudT.offsetWidth;
+    hudT.textContent = STEP_LABEL[i];
+    hudT.classList.add('swap');
   }
 
-  function updateCaptions(p, ops) {
-    bands.forEach((b, i) => {
-      const op = ops[i];
-      if (Math.abs(op - b.op) > 0.004 || (op !== b.op && (op === 0 || op === 1))) { b.el.style.opacity = op.toFixed(3); b.op = op; }
-      const ramp = b.ramp || Math.min(0.035, (b.b - b.a) * 0.35);
-      let k = clamp((p - b.a) / ramp, 0, 1);
-      if (b.first) k = Math.max(k, loadK);
-      b.k = setVar(b.el, '--k', k, b.k, 0.008);
-      const on = op > 0.5;
-      if (on !== b.on) { b.el.classList.toggle('on', on); b.on = on; }
-    });
+  function frame(p) {
+    const ops = BEATS.map(b => bandOpacity(b, p));
+    renderScene(p, ops);
+    updateStep(ops);
   }
 
-  function frame(p, now) {
-    const ops = bands.map(b => bandOpacity(b, p));
-    const n = renderScene(p, ops);
-    updateCaptions(p, ops);
-    updateLabel(String(n), now);
-  }
-
-  function tick(now) {
-    const dt = Math.min(100, now - (lastTick || now));
-    lastTick = now;
-    const k = smooth.on ? 0.24 : 0.14;
-    shown += (target - shown) * (1 - Math.pow(1 - k, dt / 16.667));
-    if (Math.abs(target - shown) < 0.0004) {
-      shown = target;
-      rafId = null;
-      lastTick = 0;
-    } else {
-      rafId = requestAnimationFrame(tick);
+  // um ciclo de 14,6 segundos com uma pausa em cada camada, para dar tempo de ler o rótulo:
+  // explodido, código, estrutura e design, conteúdo, site no ar, e desmonta para recomeçar
+  const LOOP = [[0, 0], [1.6, 0], [2.8, 0.28], [4.2, 0.30], [5.6, 0.5], [6.8, 0.57], [8.2, 0.72], [9.0, 0.75], [10.4, 1], [13.0, 1], [14.6, 0]];
+  const CYCLE = 14600;
+  const easeIO = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  function loopP(ms) {
+    const t = (ms % CYCLE) / 1000;
+    for (let i = 1; i < LOOP.length; i++) {
+      const [t1, p1] = LOOP[i];
+      if (t <= t1) {
+        const [t0, p0] = LOOP[i - 1];
+        return p0 + (p1 - p0) * easeIO((t - t0) / (t1 - t0));
+      }
     }
-    frame(shown, now);
+    return 0;
   }
-
-  function onScroll() {
-    target = heroProgress();
-    if (rafId === null && heroOn) rafId = requestAnimationFrame(tick);
+  function loopTick(now) {
+    const dt = Math.min(100, now - (loopLast || now));
+    loopLast = now;
+    loopClock += dt;
+    shown = loopP(loopClock);
+    frame(shown);
+    loopRaf = requestAnimationFrame(loopTick);
   }
-
-  function startLoadRamp() {
-    if (loadK >= 1 || loadRaf) return;
-    const t0 = performance.now();
-    const step = now => {
-      const t = clamp((now - t0) / 1300, 0, 1);
-      loadK = 1 - Math.pow(1 - t, 3);
-      updateCaptions(shown, bands.map(b => bandOpacity(b, shown)));
-      loadRaf = t < 1 ? requestAnimationFrame(step) : null;
-    };
-    loadRaf = requestAnimationFrame(step);
-  }
+  // o relógio só anda com o topo na tela e a aba aberta, e continua de onde parou
+  function loopRun() { if (!loopRaf && scrubOn && heroOn && !document.hidden) { loopLast = 0; loopRaf = requestAnimationFrame(loopTick); } }
+  function loopHalt() { if (loopRaf) { cancelAnimationFrame(loopRaf); loopRaf = null; } }
 
   function resetCaches() {
-    sc.stack = ''; sc.type = sc.live = sc.cue = sc.n = -1; sc.label = ''; sc.labelAt = 0;
+    sc.stack = ''; sc.type = sc.live = sc.n = sc.step = -1;
     sc.L.forEach(L => { L.t = ''; L.o = L.hi = L.ao = -1; });
-    bands.forEach(b => { b.op = -1; b.k = -1; b.on = null; });
   }
 
   function clearSceneInline() {
@@ -238,54 +187,41 @@
     });
   }
 
-  // mantém o leitor no mesmo lugar quando a altura do hero muda (viradas ao vivo do portão)
-  const afterHero = $('#por-que');
-  function toggleHeroClass(on) {
-    const top0 = afterHero.getBoundingClientRect().top;
-    root.classList.toggle('scrub', on);
-    if (top0 < innerHeight) {
-      const shift = afterHero.getBoundingClientRect().top - top0;
-      if (Math.abs(shift) > 1) scrollBy({ top: shift, behavior: 'instant' });
-    }
-  }
-
   function enableScrub() {
     if (scrubOn) return;
     scrubOn = true;
-    toggleHeroClass(true);
+    root.classList.add('scrub');
     measure();
     resetCaches();
-    addEventListener('scroll', onScroll, { passive: true });
-    target = shown = heroProgress();
-    frame(shown, performance.now());
-    startLoadRamp();
+    frame(shown);
+    loopRun();
   }
 
   function disableScrub() {
     if (!scrubOn) return;
     scrubOn = false;
-    removeEventListener('scroll', onScroll);
-    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; lastTick = 0; }
+    loopHalt();
     clearSceneInline();
-    toggleHeroClass(false);
+    root.classList.remove('scrub');
   }
 
-  // o portão: movimento reduzido e celular deitado sem altura recebem o quadro final parado
-  const GATES = [
-    '(prefers-reduced-motion: reduce)',
-    '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)'
-  ];
-  const MQLS = GATES.map(q => matchMedia(q));
+  // movimento reduzido recebe o site pronto, parado; com animações, o loop roda
   function applyHeroMode() {
-    if (MQLS.some(m => m.matches)) disableScrub();
+    if (RM.matches) disableScrub();
     else enableScrub();
   }
-  MQLS.forEach(m => m.addEventListener('change', applyHeroMode));
+  RM.addEventListener('change', applyHeroMode);
 
   new IntersectionObserver(es => {
     heroOn = es[0].isIntersecting;
-    if (heroOn && scrubOn) onScroll();
+    if (heroOn) loopRun(); else loopHalt();
   }).observe(hero);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) loopHalt(); else loopRun(); });
+
+  // a seta "role para ver mais" some assim que a pessoa começa a descer
+  addEventListener('scroll', () => {
+    sc.cue = setVar(cue, '--cue', clamp(1 - scrollY / 240, 0, 1), sc.cue, 0.02);
+  }, { passive: true });
 
   let resizeRaf = null;
   addEventListener('resize', () => {
@@ -295,8 +231,7 @@
       if (!scrubOn) return;
       measure();
       resetCaches();
-      target = shown = heroProgress();
-      frame(shown, performance.now());
+      frame(shown);
     });
   });
 
@@ -572,7 +507,7 @@
     ptr.cy += (ptr.tcy - ptr.cy) * b;
     ptr.drag += ((ptr.dragging ? 1 : 0) - ptr.drag) * b;
     spotEl.style.transform = `translate3d(${ptr.x.toFixed(1)}px,${ptr.y.toFixed(1)}px,0)`;
-    if (scrubOn && heroOn) frame(shown, now);
+    if (scrubOn && heroOn && !loopRaf) frame(shown);
     paintStars();
     const rest = Math.abs(ptr.tx - ptr.x) < 0.5 && Math.abs(ptr.ty - ptr.y) < 0.5 &&
       Math.abs(ptr.tcx - ptr.cx) < 0.002 && Math.abs(ptr.tcy - ptr.cy) < 0.002 &&
@@ -723,12 +658,14 @@
   STAR_LAYERS.forEach(L => {
     L.y = null;
     $$('.st', L.el).forEach(st => {
-      st.style.backgroundImage = st.classList.contains('streak') ? L.t.streak : st.classList.contains('b') ? L.t.b : L.t.a;
+      if (!st.classList.contains('b')) st.style.backgroundImage = st.classList.contains('streak') ? L.t.streak : L.t.a + ',' + L.t.b;
     });
   });
   $('.gx-dust').style.backgroundImage = starTiles(53, 260, 520, 0.25, 0.6, 0.3, 0.8, false).a;
   const streakEl = $('.s-near .streak');
   const galaxy = $('#galaxy');
+  const aurs = $('#aurs');
+  let aursT = '';
   const horizon = $('#horizon');
   const contato = $('#contato');
   const foot = $('.foot');
@@ -751,44 +688,93 @@
     });
   }
 
-  /* ---------- céu interativo: estrelas que fogem do cursor e uma onda a cada clique ---------- */
+  /* ---------- céu interativo: galáxia que gira com a rolagem, o seu D virando constelação, estrelas cadentes ---------- */
   const sky = $('#skycv');
   const sctx = sky.getContext('2d');
-  let SW = 0, SH = 0, parts = [], skyRaf = null, skyLast = 0;
+  let SW = 0, SH = 0, parts = [], skyRaf = null, skyLast = 0, skyY = scrollY, skyAcc = 0, skyClock = 0;
+  // se o aparelho estiver lento, o céu se adapta: menos estrelas e meio ritmo de atualização
+  let skyEma = 16.7, skyLow = false, skySkip = false;
   const shocks = [];
+  const meteors = [];
+  // os vértices do logo D (as duas peças), em coordenadas de 0 a 600
+  const LOGO = [
+    [[100, 140], [245, 86], [238, 410], [262, 412], [260, 498], [82, 486]],
+    [[262, 108], [448, 46], [505, 96], [508, 372], [452, 428], [258, 455], [256, 410], [398, 400], [400, 140], [292, 148], [290, 186], [266, 190]]
+  ];
+  let cons = [];
+  // um carimbo de brilho desenhado uma vez: cada estrela vira um drawImage barato em vez de um círculo novo
+  const glowSprite = document.createElement('canvas');
+  glowSprite.width = glowSprite.height = 32;
+  (() => {
+    const g = glowSprite.getContext('2d');
+    const rg = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+    rg.addColorStop(0, 'rgba(255,255,255,1)');
+    rg.addColorStop(0.12, 'rgba(235,242,255,.95)');
+    rg.addColorStop(0.3, 'rgba(200,220,255,.28)');
+    rg.addColorStop(1, 'rgba(200,220,255,0)');
+    g.fillStyle = rg;
+    g.fillRect(0, 0, 32, 32);
+  })();
   function skySize() {
-    const dpr = Math.min(1.5, devicePixelRatio || 1);
+    const dpr = 1;
     SW = innerWidth;
     SH = innerHeight;
     sky.width = Math.round(SW * dpr);
     sky.height = Math.round(SH * dpr);
     sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // estrelas soltas espalhadas num disco que cobre a tela inteira, para a galáxia poder girar sem buracos
     const r = rng(77);
-    const n = SW < 760 ? 60 : 130;
+    const n = Math.round((SW < 760 ? 90 : 160) * (skyLow ? 0.6 : 1));
+    const R = Math.hypot(SW, SH) * 0.56;
     parts = [];
     for (let i = 0; i < n; i++) {
-      const hx = r() * SW, hy = r() * SH * 3;
-      parts.push({ hx, hy, x: hx, y: hy % SH, vx: 0, vy: 0, rad: 0.5 + r() * 1.3, a: 0.35 + r() * 0.55, ph: r() * 6.283, sp: 0.4 + r() * 1.1, dx: (r() - 0.5) * 0.06, dy: (r() - 0.5) * 0.06 });
+      const rad = Math.sqrt(r()) * R, ang = r() * 6.283;
+      parts.push({ rad, ang, x: SW / 2 + Math.cos(ang) * rad, y: SH / 2 + Math.sin(ang) * rad, vx: 0, vy: 0, size: 0.5 + r() * 1.3, a: 0.35 + r() * 0.55, ph: r() * 6.283, sp: 0.4 + r() * 1.1 });
     }
+    // a constelação: cada vértice começa num ponto qualquer do céu e vai para o seu lugar no D
+    // no computador o D termina no espaço livre embaixo das camadas da chamada final; no celular, no alto da tela
+    const wide = SW >= 981;
+    const S = wide ? Math.min(SH * 0.3, SW * 0.19, 250) : Math.min(SW * 0.5, 220);
+    const cx = wide ? SW * 0.235 : SW * 0.5, cy = SH * (wide ? 0.575 : 0.24);
+    const rc = rng(91);
+    cons = LOGO.map(poly => poly.map(([vx, vy]) => ({
+      sx: rc() * SW, sy: rc() * SH,
+      tx: cx + (vx - 300) / 600 * S, ty: cy + (vy - 300) / 600 * S,
+      ph: rc() * 6.283
+    })));
+  }
+  function drawGlowDot(x, y, size, alpha) {
+    const g = size * 5;
+    sctx.globalAlpha = alpha;
+    sctx.drawImage(glowSprite, x - g, y - g, g * 2, g * 2);
   }
   function skyTick(now) {
+    if (skyLow) {
+      skySkip = !skySkip;
+      if (skySkip) { skyRaf = requestAnimationFrame(skyTick); return; }
+    }
     const dt = Math.min(50, now - (skyLast || now));
     skyLast = now;
+    skyEma = skyEma * 0.95 + dt * 0.05;
+    if (!skyLow && skyClock > 3000 && skyEma > 26) { skyLow = true; parts.length = Math.round(parts.length * 0.6); }
+    skyClock += dt;
     const f = dt / 16.667;
     sctx.clearRect(0, 0, SW, SH);
-    const shift = scrollY * 0.11;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const pg = max > 0 ? clamp(scrollY / max, 0, 1) : 0;
+    const dy = scrollY - skyY;
+    skyY = scrollY;
+    // a galáxia gira devagar sozinha e bem mais quando a pessoa rola
+    const theta = scrollY * 0.00016 + skyClock * 0.000006;
     const R = SW < 760 ? 110 : 150, R2 = R * R;
     const pOn = spotEl.classList.contains('on');
     const damp = Math.pow(0.88, f);
     for (let s = shocks.length - 1; s >= 0; s--) if ((now - shocks[s].t0) > 1300) shocks.splice(s, 1);
     sctx.fillStyle = '#DCE8FF';
     for (const p of parts) {
-      p.hx = (p.hx + p.dx * f + SW) % SW;
-      p.hy += p.dy * f;
-      const hy = (((p.hy - shift) % SH) + SH) % SH;
-      if (Math.abs(hy - p.y) > SH / 2) p.y += hy > p.y ? SH : -SH;
-      if (Math.abs(p.hx - p.x) > SW / 2) p.x += p.hx > p.x ? SW : -SW;
-      let ax = (p.hx - p.x) * 0.012, ay = (hy - p.y) * 0.012;
+      const hx = SW / 2 + Math.cos(p.ang + theta) * p.rad;
+      const hy = SH / 2 + Math.sin(p.ang + theta) * p.rad * 0.86;
+      let ax = (hx - p.x) * 0.012, ay = (hy - p.y) * 0.012;
       if (pOn) {
         const ddx = p.x - ptr.x, ddy = p.y - ptr.y, d2 = ddx * ddx + ddy * ddy;
         if (d2 < R2) { const d = Math.sqrt(d2) || 1, k = (1 - d / R) ** 2 * 1.5; ax += ddx / d * k; ay += ddy / d * k; }
@@ -802,18 +788,78 @@
       p.vy = (p.vy + ay * f) * damp;
       p.x += p.vx * f;
       p.y += p.vy * f;
+      if (p.x < -20 || p.x > SW + 20 || p.y < -20 || p.y > SH + 20) continue;
       const tw = 0.62 + 0.38 * Math.sin(now * 0.001 * p.sp + p.ph);
-      sctx.globalAlpha = p.a * tw * skyAlpha;
-      sctx.beginPath();
-      sctx.arc(p.x, p.y, p.rad, 0, 6.283);
-      sctx.fill();
-      if (p.rad > 1.35) {
-        sctx.globalAlpha = p.a * tw * 0.12 * skyAlpha;
-        sctx.beginPath();
-        sctx.arc(p.x, p.y, p.rad * 4, 0, 6.283);
-        sctx.fill();
+      if (p.size > 1.35) drawGlowDot(p.x, p.y, p.size, p.a * tw * skyAlpha);
+      else {
+        sctx.globalAlpha = p.a * tw * skyAlpha;
+        sctx.fillRect(p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
       }
     }
+
+    // o seu D se forma no céu conforme a página desce, e as linhas da constelação se desenham no fim
+    const form = easeIO(sstep(0.04, 0.82, pg));
+    const lines = sstep(0.4, 0.94, pg);
+    const done = sstep(0.9, 1, pg);
+    const conAlpha = Math.max(skyAlpha, 0.55 + done * 0.45);
+    const pts = cons.map(poly => poly.map(v => ({
+      x: lerp(v.sx, v.tx, form) + Math.sin(now * 0.0011 + v.ph) * 1.2 * (1 - form * 0.6),
+      y: lerp(v.sy, v.ty, form) + Math.cos(now * 0.0013 + v.ph) * 1.2 * (1 - form * 0.6),
+      ph: v.ph
+    })));
+    if (lines > 0) {
+      const total = pts.reduce((n, poly) => n + poly.length, 0);
+      let budget = lines * total;
+      sctx.strokeStyle = '#8AB2FF';
+      sctx.lineWidth = 1.2;
+      sctx.globalAlpha = (0.22 + done * (0.2 + 0.08 * Math.sin(now * 0.002))) * conAlpha;
+      sctx.beginPath();
+      for (const poly of pts) {
+        for (let i = 0; i < poly.length && budget > 0; i++) {
+          const a = poly[i], b = poly[(i + 1) % poly.length];
+          const k = Math.min(1, budget);
+          sctx.moveTo(a.x, a.y);
+          sctx.lineTo(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k);
+          budget -= 1;
+        }
+      }
+      sctx.stroke();
+    }
+    sctx.fillStyle = '#E6EEFF';
+    for (const poly of pts) {
+      for (const v of poly) {
+        const tw = 0.7 + 0.3 * Math.sin(now * 0.0017 + v.ph);
+        drawGlowDot(v.x, v.y, 1.1 + form * 0.6 + done * 0.4, (0.35 + form * 0.6) * tw * conAlpha);
+      }
+    }
+
+    // estrelas cadentes: a cada trecho rolado, uma risca o céu
+    skyAcc += Math.abs(dy);
+    if (skyAcc > 1100 && meteors.length < 3) {
+      skyAcc = 0;
+      const ang = (150 + Math.random() * 14) * Math.PI / 180;
+      meteors.push({ x: SW * (0.35 + Math.random() * 0.6), y: SH * (0.04 + Math.random() * 0.36), ang, len: 140 + Math.random() * 120, t0: now });
+    }
+    for (let m = meteors.length - 1; m >= 0; m--) {
+      const mt = meteors[m];
+      const age = (now - mt.t0) / 1000;
+      if (age > 0.9) { meteors.splice(m, 1); continue; }
+      if (age < 0) continue;
+      const dist = age * 950;
+      const hx = mt.x + Math.cos(mt.ang) * dist, hy = mt.y + Math.sin(mt.ang) * dist;
+      const tx = hx - Math.cos(mt.ang) * mt.len, ty = hy - Math.sin(mt.ang) * mt.len;
+      const gr = sctx.createLinearGradient(tx, ty, hx, hy);
+      gr.addColorStop(0, 'rgba(190,215,255,0)');
+      gr.addColorStop(1, 'rgba(225,236,255,1)');
+      sctx.globalAlpha = (age < 0.15 ? age / 0.15 : 1 - (age - 0.15) / 0.75) * 0.9;
+      sctx.strokeStyle = gr;
+      sctx.lineWidth = 1.6;
+      sctx.beginPath();
+      sctx.moveTo(tx, ty);
+      sctx.lineTo(hx, hy);
+      sctx.stroke();
+    }
+
     for (const sh of shocks) {
       const age = (now - sh.t0) / 1000;
       if (age <= 0 || age > 1.1) continue;
@@ -857,6 +903,8 @@
     // depois do topo, as estrelas ficam mais discretas atrás dos textos; voltam a brilhar no fim, perto do planeta
     const dim = y > hero.offsetHeight - innerHeight * 0.5 && contato.getBoundingClientRect().top > innerHeight * 0.4;
     if (dim !== starsDim) { STAR_LAYERS.forEach(L => L.el.style.setProperty('--so', dim ? '0.4' : '1')); starsDim = dim; skyAlpha = dim ? 0.45 : 1; }
+    const au = `translate3d(0,${(-pg * 22).toFixed(2)}vh,0) rotate(${(pg * 10).toFixed(2)}deg)`;
+    if (au !== aursT) { aurs.style.transform = au; aursT = au; }
     const g = `translate3d(0,${(-pg * 34).toFixed(2)}vh,0) rotate(${(-18 + pg * 14).toFixed(2)}deg)`;
     if (g !== gxT) { galaxy.style.transform = g; gxT = g; }
     const r = contato.getBoundingClientRect();
