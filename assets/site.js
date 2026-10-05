@@ -10,29 +10,25 @@
   function rng(seed) { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
 
   const root = document.documentElement;
-  /* ---------- movimento reduzido: respeitado por padrão, com um botão para ligar as animações ---------- */
-  const SYS_RM = matchMedia('(prefers-reduced-motion: reduce)');
-  let forceMotion = false;
-  try { forceMotion = localStorage.getItem('dd-motion') === 'on'; } catch (e) { /* sem armazenamento: fica o padrão */ }
+  /* ---------- animações: ligadas para todo mundo; quem preferir menos movimento desliga no rodapé ---------- */
+  let motionOff = false;
+  try { motionOff = localStorage.getItem('dd-motion') === 'off'; } catch (e) { /* sem armazenamento: fica o padrão */ }
   const rmListeners = [];
   const RM = {
-    get matches() { return SYS_RM.matches && !forceMotion; },
+    get matches() { return motionOff; },
     addEventListener(type, fn) { rmListeners.push(fn); }
   };
-  const emitRM = () => rmListeners.forEach(fn => fn({ matches: RM.matches }));
   const motionBtn = $('#motionToggle');
   function syncMotionUI() {
-    root.classList.toggle('rm-sys', SYS_RM.matches);
-    root.classList.toggle('force-motion', SYS_RM.matches && forceMotion);
-    motionBtn.setAttribute('aria-pressed', String(forceMotion));
-    $('.mt-label', motionBtn).textContent = forceMotion ? 'Menos movimento' : 'Ver com animações';
+    root.classList.toggle('reduce-motion', motionOff);
+    motionBtn.setAttribute('aria-pressed', String(!motionOff));
+    motionBtn.textContent = motionOff ? 'Ligar animações' : 'Reduzir animações';
   }
-  SYS_RM.addEventListener('change', () => { syncMotionUI(); emitRM(); });
   motionBtn.addEventListener('click', () => {
-    forceMotion = !forceMotion;
-    try { localStorage.setItem('dd-motion', forceMotion ? 'on' : 'off'); } catch (e) { /* sem armazenamento: vale só nesta visita */ }
+    motionOff = !motionOff;
+    try { localStorage.setItem('dd-motion', motionOff ? 'off' : 'on'); } catch (e) { /* vale só nesta visita */ }
     syncMotionUI();
-    emitRM();
+    rmListeners.forEach(fn => fn({ matches: motionOff }));
   });
   syncMotionUI();
 
@@ -693,7 +689,10 @@
   const sctx = sky.getContext('2d');
   let SW = 0, SH = 0, parts = [], skyRaf = null, skyLast = 0, skyY = scrollY, skyAcc = 0, skyClock = 0;
   // se o aparelho estiver lento, o céu se adapta: menos estrelas e meio ritmo de atualização
-  let skyEma = 16.7, skyLow = false, skySkip = false;
+  let skyEma = 16.7, skyLow = false, skySkip = false, skyFrame = 0, skyBusyUntil = 0;
+  // com a pessoa parada, o céu desenha 1 a cada 3 quadros; ao mexer o mouse, rolar ou tocar, volta ao ritmo cheio
+  const skyWake = () => { skyBusyUntil = performance.now() + 1500; };
+  ['pointermove', 'pointerdown', 'scroll', 'touchmove', 'wheel'].forEach(t => addEventListener(t, skyWake, { passive: true }));
   const shocks = [];
   const meteors = [];
   // os vértices do logo D (as duas peças), em coordenadas de 0 a 600
@@ -749,13 +748,16 @@
     sctx.drawImage(glowSprite, x - g, y - g, g * 2, g * 2);
   }
   function skyTick(now) {
-    if (skyLow) {
+    skyFrame++;
+    const busy = now < skyBusyUntil || shocks.length > 0 || meteors.length > 0;
+    if (!busy && skyFrame % 3 !== 0) { skyRaf = requestAnimationFrame(skyTick); return; }
+    if (skyLow && busy) {
       skySkip = !skySkip;
       if (skySkip) { skyRaf = requestAnimationFrame(skyTick); return; }
     }
     const dt = Math.min(50, now - (skyLast || now));
     skyLast = now;
-    skyEma = skyEma * 0.95 + dt * 0.05;
+    if (busy) skyEma = skyEma * 0.95 + dt * 0.05;
     if (!skyLow && skyClock > 3000 && skyEma > 26) { skyLow = true; parts.length = Math.round(parts.length * 0.6); }
     skyClock += dt;
     const f = dt / 16.667;
@@ -949,7 +951,7 @@
     if (sLast && Math.abs(scrollY - sC) > 3) { sRaf = null; sLast = 0; return; }
     const dt = Math.min(100, now - (sLast || now));
     sLast = now;
-    sC += (sT - sC) * (1 - Math.pow(1 - 0.11, dt / 16.667));
+    sC += (sT - sC) * (1 - Math.pow(1 - 0.2, dt / 16.667));
     if (Math.abs(sT - sC) < 0.5) { sC = sT; sRaf = null; sLast = 0; } else sRaf = requestAnimationFrame(smoothTick);
     scrollTo({ top: sC, behavior: 'instant' });
   }
