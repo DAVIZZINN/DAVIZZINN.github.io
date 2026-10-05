@@ -63,7 +63,7 @@
 
   /* ---------- ponteiro: mouse, caneta e toque ---------- */
   const FINE = matchMedia('(hover: hover) and (pointer: fine)');
-  const ptr = { tx: innerWidth / 2, ty: innerHeight * 0.3, x: innerWidth / 2, y: innerHeight * 0.3, cx: 0, cy: 0, tcx: 0, tcy: 0, raf: null, last: 0 };
+  const ptr = { tx: innerWidth / 2, ty: innerHeight * 0.3, x: innerWidth / 2, y: innerHeight * 0.3, cx: 0, cy: 0, tcx: 0, tcy: 0, drag: 0, dragging: false, raf: null, last: 0 };
   const smooth = { on: false };
 
   /* ---------- hero: a vista explodida ---------- */
@@ -367,6 +367,25 @@
     return x.length >= 2 ? ['Site completo', 'R$ 1.200'] : ['Página única', 'R$ 300'];
   }
 
+  // o preço sobe ou desce contando, em vez de trocar de uma vez
+  let priceNow = 300, priceRaf = null;
+  function countPrice(label, animate) {
+    const el = $('#pk-price');
+    const to = +label.replace(/\D/g, '');
+    if (priceRaf) cancelAnimationFrame(priceRaf);
+    if (!animate || RM.matches || to === priceNow) { priceNow = to; el.textContent = label; return; }
+    const from = priceNow, t0 = performance.now(), dur = 900;
+    const step = now => {
+      const t = clamp((now - t0) / dur, 0, 1);
+      const e = 1 - Math.pow(1 - t, 3);
+      priceNow = Math.round(from + (to - from) * e);
+      el.textContent = 'R$ ' + priceNow.toLocaleString('pt-BR');
+      priceRaf = t < 1 ? requestAnimationFrame(step) : null;
+      if (!priceRaf) el.textContent = label;
+    };
+    priceRaf = requestAnimationFrame(step);
+  }
+
   function updateCfg(animate) {
     const f = new FormData(cfg);
     const biz = f.get('biz');
@@ -375,8 +394,12 @@
     pv.innerHTML = msHTML(biz, style, { items: x.includes('items'), gallery: x.includes('gallery'), map: x.includes('map'), anim: x.includes('anim') });
     pvUrl.textContent = BIZ[biz].url;
     const [name, price] = priceFor(x);
-    $('#pk-name').textContent = name;
-    $('#pk-price').textContent = price;
+    const nameEl = $('#pk-name');
+    if (nameEl.textContent !== name) {
+      nameEl.textContent = name;
+      if (animate && !RM.matches) { nameEl.classList.remove('pk-swap'); void nameEl.offsetWidth; nameEl.classList.add('pk-swap'); }
+    }
+    countPrice(price, animate);
     const extras = x.length ? joinPt(x.map(v => X_LABEL[v])) : 'o básico';
     $('#pk-send').href = waLink(`Oi David! Montei uma ideia no seu site: ${BIZ[biz].label}, estilo ${style}, com ${extras}. Deu ${name.toLowerCase()}, a partir de ${price}. Quero um orçamento.`);
     if (animate && !RM.matches) {
@@ -547,10 +570,13 @@
     ptr.y += (ptr.ty - ptr.y) * a;
     ptr.cx += (ptr.tcx - ptr.cx) * b;
     ptr.cy += (ptr.tcy - ptr.cy) * b;
+    ptr.drag += ((ptr.dragging ? 1 : 0) - ptr.drag) * b;
     spotEl.style.transform = `translate3d(${ptr.x.toFixed(1)}px,${ptr.y.toFixed(1)}px,0)`;
     if (scrubOn && heroOn) frame(shown, now);
+    paintStars();
     const rest = Math.abs(ptr.tx - ptr.x) < 0.5 && Math.abs(ptr.ty - ptr.y) < 0.5 &&
-      Math.abs(ptr.tcx - ptr.cx) < 0.002 && Math.abs(ptr.tcy - ptr.cy) < 0.002;
+      Math.abs(ptr.tcx - ptr.cx) < 0.002 && Math.abs(ptr.tcy - ptr.cy) < 0.002 &&
+      Math.abs((ptr.dragging ? 1 : 0) - ptr.drag) < 0.002;
     if (rest) { ptr.raf = null; ptr.last = 0; } else ptr.raf = requestAnimationFrame(ptrTick);
   }
   const ptrKick = () => { if (!ptr.raf) ptr.raf = requestAnimationFrame(ptrTick); };
@@ -566,12 +592,29 @@
     ptrKick();
   }
   addEventListener('pointermove', ptrAt, { passive: true });
-  addEventListener('pointerdown', ptrAt, { passive: true });
+  addEventListener('pointerdown', e => {
+    ptrAt(e);
+    // segurar e arrastar o fundo puxa o céu com mais força
+    if (e.pointerType === 'mouse' && !e.target.closest('a, button, input, textarea, label, .tilt, form')) { ptr.dragging = true; ptrKick(); }
+  }, { passive: true });
+  addEventListener('pointerup', () => { if (ptr.dragging) { ptr.dragging = false; ptrKick(); } }, { passive: true });
   document.addEventListener('pointerout', e => {
     if (e.relatedTarget) return;
     ptr.tcx = ptr.tcy = 0;
+    ptr.dragging = false;
     ptrKick();
   });
+  // no celular e no tablet, arrastar o dedo também mexe as estrelas
+  addEventListener('touchmove', e => {
+    if (RM.matches || !e.touches[0]) return;
+    const t = e.touches[0];
+    ptr.tcx = clamp(t.clientX / innerWidth * 2 - 1, -1, 1);
+    ptr.tcy = clamp(t.clientY / innerHeight * 2 - 1, -1, 1);
+    ptr.tx = t.clientX;
+    ptr.ty = t.clientY;
+    ptrKick();
+  }, { passive: true });
+  addEventListener('touchend', () => { ptr.tcx = ptr.tcy = 0; ptrKick(); }, { passive: true });
 
   /* ---------- brilho nos cards que segue o cursor, a caneta ou o dedo ---------- */
   $$('.spot').forEach(el => {
@@ -694,7 +737,109 @@
     meteor.style.setProperty('--tx', (45 + Math.random() * 45).toFixed(1) + '%');
     meteor.style.setProperty('--ty', (4 + Math.random() * 30).toFixed(1) + '%');
   });
-  let lastY = scrollY, vel = 0, velRaf = null, streakO = -1, gxT = '', hzT = '', starsDim = null;
+  let lastY = scrollY, vel = 0, velRaf = null, streakO = -1, gxT = '', hzT = '', starsDim = null, skyAlpha = 1;
+
+  // cada camada de estrelas anda com a rolagem e desliza ao contrário do mouse, mais perto = mais movimento
+  const STAR_SHIFT = [7, 16, 30];
+  function paintStars() {
+    const k = 1 + ptr.drag * 1.6;
+    STAR_LAYERS.forEach((L, i) => {
+      const sx = -ptr.cx * STAR_SHIFT[i] * k;
+      const sy = (L.sy || 0) - ptr.cy * STAR_SHIFT[i] * k;
+      const t = `translate3d(${sx.toFixed(1)}px,${sy.toFixed(1)}px,0)`;
+      if (t !== L.y) { L.el.style.transform = t; L.y = t; }
+    });
+  }
+
+  /* ---------- céu interativo: estrelas que fogem do cursor e uma onda a cada clique ---------- */
+  const sky = $('#skycv');
+  const sctx = sky.getContext('2d');
+  let SW = 0, SH = 0, parts = [], skyRaf = null, skyLast = 0;
+  const shocks = [];
+  function skySize() {
+    const dpr = Math.min(1.5, devicePixelRatio || 1);
+    SW = innerWidth;
+    SH = innerHeight;
+    sky.width = Math.round(SW * dpr);
+    sky.height = Math.round(SH * dpr);
+    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const r = rng(77);
+    const n = SW < 760 ? 60 : 130;
+    parts = [];
+    for (let i = 0; i < n; i++) {
+      const hx = r() * SW, hy = r() * SH * 3;
+      parts.push({ hx, hy, x: hx, y: hy % SH, vx: 0, vy: 0, rad: 0.5 + r() * 1.3, a: 0.35 + r() * 0.55, ph: r() * 6.283, sp: 0.4 + r() * 1.1, dx: (r() - 0.5) * 0.06, dy: (r() - 0.5) * 0.06 });
+    }
+  }
+  function skyTick(now) {
+    const dt = Math.min(50, now - (skyLast || now));
+    skyLast = now;
+    const f = dt / 16.667;
+    sctx.clearRect(0, 0, SW, SH);
+    const shift = scrollY * 0.11;
+    const R = SW < 760 ? 110 : 150, R2 = R * R;
+    const pOn = spotEl.classList.contains('on');
+    const damp = Math.pow(0.88, f);
+    for (let s = shocks.length - 1; s >= 0; s--) if ((now - shocks[s].t0) > 1300) shocks.splice(s, 1);
+    sctx.fillStyle = '#DCE8FF';
+    for (const p of parts) {
+      p.hx = (p.hx + p.dx * f + SW) % SW;
+      p.hy += p.dy * f;
+      const hy = (((p.hy - shift) % SH) + SH) % SH;
+      if (Math.abs(hy - p.y) > SH / 2) p.y += hy > p.y ? SH : -SH;
+      if (Math.abs(p.hx - p.x) > SW / 2) p.x += p.hx > p.x ? SW : -SW;
+      let ax = (p.hx - p.x) * 0.012, ay = (hy - p.y) * 0.012;
+      if (pOn) {
+        const ddx = p.x - ptr.x, ddy = p.y - ptr.y, d2 = ddx * ddx + ddy * ddy;
+        if (d2 < R2) { const d = Math.sqrt(d2) || 1, k = (1 - d / R) ** 2 * 1.5; ax += ddx / d * k; ay += ddy / d * k; }
+      }
+      for (const sh of shocks) {
+        const age = Math.max(0, (now - sh.t0) / 1000), rad = age * 620;
+        const ddx = p.x - sh.x, ddy = p.y - sh.y, d = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
+        if (Math.abs(d - rad) < 46) { const k = (1 - age) * 1.8; ax += ddx / d * k; ay += ddy / d * k; }
+      }
+      p.vx = (p.vx + ax * f) * damp;
+      p.vy = (p.vy + ay * f) * damp;
+      p.x += p.vx * f;
+      p.y += p.vy * f;
+      const tw = 0.62 + 0.38 * Math.sin(now * 0.001 * p.sp + p.ph);
+      sctx.globalAlpha = p.a * tw * skyAlpha;
+      sctx.beginPath();
+      sctx.arc(p.x, p.y, p.rad, 0, 6.283);
+      sctx.fill();
+      if (p.rad > 1.35) {
+        sctx.globalAlpha = p.a * tw * 0.12 * skyAlpha;
+        sctx.beginPath();
+        sctx.arc(p.x, p.y, p.rad * 4, 0, 6.283);
+        sctx.fill();
+      }
+    }
+    for (const sh of shocks) {
+      const age = (now - sh.t0) / 1000;
+      if (age <= 0 || age > 1.1) continue;
+      sctx.globalAlpha = 0.28 * (1 - age / 1.1) * skyAlpha;
+      sctx.strokeStyle = '#8AB2FF';
+      sctx.lineWidth = 1.5;
+      sctx.beginPath();
+      sctx.arc(sh.x, sh.y, age * 620, 0, 6.283);
+      sctx.stroke();
+    }
+    sctx.globalAlpha = 1;
+    skyRaf = requestAnimationFrame(skyTick);
+  }
+  function skyStart() { if (!skyRaf && !RM.matches && !document.hidden) { skyLast = 0; skyRaf = requestAnimationFrame(skyTick); } }
+  function skyStop() { if (skyRaf) { cancelAnimationFrame(skyRaf); skyRaf = null; } sctx.clearRect(0, 0, SW, SH); }
+  skySize();
+  skyStart();
+  let skyResize = null;
+  addEventListener('resize', () => { clearTimeout(skyResize); skyResize = setTimeout(skySize, 200); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) skyStop(); else skyStart(); });
+  // um clique (ou toque) em qualquer lugar manda uma onda pelo céu
+  addEventListener('pointerdown', e => {
+    if (RM.matches || e.target.closest('input, textarea')) return;
+    shocks.push({ x: e.clientX, y: e.clientY, t0: performance.now() });
+    if (shocks.length > 4) shocks.shift();
+  }, { passive: true });
   // rastro das estrelas: acende com a velocidade da rolagem e apaga sozinho quando ela para
   function velTick() {
     vel *= 0.9;
@@ -707,13 +852,11 @@
     vel += clamp(y - lastY, -160, 160) * 0.35;
     lastY = y;
     if (!velRaf && !RM.matches) velRaf = requestAnimationFrame(velTick);
-    STAR_LAYERS.forEach(L => {
-      const ty = Math.round(-((y * L.speed) % L.size) * 10) / 10;
-      if (ty !== L.y) { L.el.style.transform = `translate3d(0,${ty}px,0)`; L.y = ty; }
-    });
+    STAR_LAYERS.forEach(L => { L.sy = -((y * L.speed) % L.size); });
+    paintStars();
     // depois do topo, as estrelas ficam mais discretas atrás dos textos; voltam a brilhar no fim, perto do planeta
     const dim = y > hero.offsetHeight - innerHeight * 0.5 && contato.getBoundingClientRect().top > innerHeight * 0.4;
-    if (dim !== starsDim) { STAR_LAYERS.forEach(L => L.el.style.setProperty('--so', dim ? '0.4' : '1')); starsDim = dim; }
+    if (dim !== starsDim) { STAR_LAYERS.forEach(L => L.el.style.setProperty('--so', dim ? '0.4' : '1')); starsDim = dim; skyAlpha = dim ? 0.45 : 1; }
     const g = `translate3d(0,${(-pg * 34).toFixed(2)}vh,0) rotate(${(-18 + pg * 14).toFixed(2)}deg)`;
     if (g !== gxT) { galaxy.style.transform = g; gxT = g; }
     const r = contato.getBoundingClientRect();
@@ -764,7 +907,7 @@
   }
   function stopSmooth() { if (sRaf) { cancelAnimationFrame(sRaf); sRaf = null; sLast = 0; } }
   addEventListener('wheel', e => {
-    if (!smooth.on || e.ctrlKey || e.defaultPrevented) return;
+    if (!smooth.on || e.ctrlKey || e.defaultPrevented || root.classList.contains('pm-lock')) return;
     if (e.target.closest && e.target.closest('textarea, select')) return;
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     e.preventDefault();
@@ -784,8 +927,142 @@
   SMOOTH_Q.addEventListener('change', applySmooth);
   applySmooth();
 
+  /* ---------- ondulação ao clicar em botões, chips, dúvidas e menu ---------- */
+  const RIPPLE = '.btn, .chips span, .qa button, .menu-btn, .menu a, .work-open, .pm-close';
+  addEventListener('pointerdown', e => {
+    if (RM.matches) return;
+    let el = e.target.closest('.chips label');
+    el = el ? $('span', el) : e.target.closest(RIPPLE);
+    if (!el) return;
+    let box = el.querySelector(':scope > .rbox');
+    if (!box) { box = document.createElement('span'); box.className = 'rbox'; box.setAttribute('aria-hidden', 'true'); el.prepend(box); }
+    const r = el.getBoundingClientRect();
+    const d = Math.max(r.width, r.height) * 2.4;
+    const rp = document.createElement('span');
+    rp.className = 'ripple';
+    rp.style.cssText = `left:${(e.clientX - r.left).toFixed(0)}px;top:${(e.clientY - r.top).toFixed(0)}px;width:${d.toFixed(0)}px;height:${d.toFixed(0)}px`;
+    box.appendChild(rp);
+    rp.addEventListener('animationend', () => rp.remove(), { once: true });
+  }, { passive: true });
+
+  /* ---------- projetos: abrem numa janela que cresce a partir do card ---------- */
+  const PM_FEATURES = {
+    restaurante: ['Cardápio com preços', 'Pedido direto no WhatsApp', 'Galeria de fotos', 'Mapa e horários'],
+    beleza: ['Serviços com preço', 'Agendamento pelo WhatsApp', 'Galeria dos trabalhos', 'Endereço e horários'],
+    profissional: ['Planos e valores', 'Avaliação marcada pelo WhatsApp', 'Fotos dos treinos', 'Onde atende e horários'],
+    loja: ['Coleção com preços', 'Pedido pelo WhatsApp', 'Galeria de looks', 'Endereço da loja']
+  };
+  const pm = $('#pm');
+  const pmPanel = $('#pm-panel');
+  let pmFrom = null, pmBusy = false;
+  function openProject(work) {
+    if (pm.classList.contains('open') || pmBusy) return;
+    const key = $('.work-open', work).dataset.open;
+    const d = BIZ[key];
+    const view = $('.ms-view', work);
+    $('#pm-ms').innerHTML = msHTML(key, view.dataset.style, { items: true, gallery: true, map: true });
+    $('#pm-url').textContent = d.url;
+    $('#pm-tag').textContent = $('.tag', work).textContent;
+    $('#pm-title').textContent = $('h3', work).textContent;
+    $('#pm-desc').textContent = $('.work-meta p:last-child', work).textContent;
+    $('#pm-list').innerHTML = PM_FEATURES[key].map(t => `<li>${t}</li>`).join('');
+    $('#pm-pack').innerHTML = 'Um site assim sai no pacote <b>Site completo</b>, a partir de <b>R$ 1.200</b>.';
+    $('#pm-cta').href = waLink(`Oi David! Vi o projeto ${$('h3', work).textContent} no seu portfólio e quero um site assim para o meu negócio.`);
+    pmFrom = work;
+    const gap = innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.paddingRight = gap ? gap + 'px' : '';
+    root.classList.add('pm-lock');
+    stopSmooth();
+    pmPanel.classList.remove('anim');
+    pm.classList.add('open');
+    if (!RM.matches) {
+      // começa exatamente em cima do card e cresce até o centro
+      const a = $('.tilt', work).getBoundingClientRect();
+      const b = pmPanel.getBoundingClientRect();
+      pmPanel.style.transform = `translate(${(a.left - b.left).toFixed(1)}px,${(a.top - b.top).toFixed(1)}px) scale(${(a.width / b.width).toFixed(4)},${(a.height / b.height).toFixed(4)})`;
+      void pmPanel.offsetWidth;
+      pmPanel.classList.add('anim');
+      pmPanel.style.transform = '';
+    }
+    setTimeout(() => $('.pm-close', pm).focus({ preventScroll: true }), 60);
+  }
+  function closeProject() {
+    if (!pm.classList.contains('open') || pmBusy) return;
+    const work = pmFrom;
+    if (!RM.matches && work) {
+      pmBusy = true;
+      const a = $('.tilt', work).getBoundingClientRect();
+      pmPanel.style.transform = '';
+      const b = pmPanel.getBoundingClientRect();
+      pmPanel.classList.add('anim');
+      pmPanel.style.transform = `translate(${(a.left - b.left).toFixed(1)}px,${(a.top - b.top).toFixed(1)}px) scale(${(a.width / b.width).toFixed(4)},${(a.height / b.height).toFixed(4)})`;
+    }
+    pm.classList.remove('open');
+    setTimeout(() => {
+      pmPanel.classList.remove('anim');
+      pmPanel.style.transform = '';
+      root.classList.remove('pm-lock');
+      document.documentElement.style.paddingRight = '';
+      pmBusy = false;
+      if (work) $('.work-open', work).focus({ preventScroll: true });
+    }, RM.matches ? 0 : 800);
+  }
+  $$('.work').forEach(work => {
+    $('.tilt', work).addEventListener('click', () => openProject(work));
+  });
+  pm.addEventListener('click', e => { if (e.target.closest('[data-close]')) closeProject(); });
+  addEventListener('keydown', e => {
+    if (!pm.classList.contains('open')) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeProject(); return; }
+    if (e.key === 'Tab') {
+      const f = $$('button, a[href]', pm).filter(el => el.offsetParent !== null);
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  /* ---------- links do menu: a página desce devagar até a seção ---------- */
+  let tweenRaf = null;
+  const stopTween = () => { if (tweenRaf) { cancelAnimationFrame(tweenRaf); tweenRaf = null; } };
+  function tweenScroll(to) {
+    stopSmooth();
+    stopTween();
+    to = clamp(to, 0, maxScroll());
+    if (RM.matches) { scrollTo({ top: to, behavior: 'instant' }); return; }
+    const from = scrollY, dist = to - from;
+    const dur = clamp(Math.abs(dist) * 0.16, 700, 1900);
+    const t0 = performance.now();
+    const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    let set = from;
+    const step = now => {
+      // outra coisa moveu a página (barra de rolagem, busca, outro link): a descida cede o lugar
+      if (Math.abs(scrollY - set) > 3) { tweenRaf = null; return; }
+      const t = clamp((now - t0) / dur, 0, 1);
+      set = from + dist * ease(t);
+      scrollTo({ top: set, behavior: 'instant' });
+      tweenRaf = t < 1 ? requestAnimationFrame(step) : null;
+    };
+    tweenRaf = requestAnimationFrame(step);
+  }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a || a.classList.contains('skip')) return;
+    const id = a.getAttribute('href');
+    const el = id.length > 1 && document.querySelector(id);
+    if (!el) return;
+    e.preventDefault();
+    const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+    tweenScroll(id === '#topo' ? 0 : el.getBoundingClientRect().top + scrollY - margin);
+    history.replaceState(null, '', id);
+  });
+  addEventListener('wheel', stopTween, { passive: true });
+  addEventListener('touchstart', stopTween, { passive: true });
+  addEventListener('keydown', e => { if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) stopTween(); });
+
   /* ---------- movimento reduzido ao vivo, nas duas direções ---------- */
   function pinToFinalStates() {
+    skyStop();
     groups.forEach(g => g.classList.add('in', 'done'));
     lastDraw = -1;
     drawSteps();
@@ -793,8 +1070,11 @@
     $$('.tilt, .magnet').forEach(el => { el.style.transform = ''; });
     spotEl.classList.remove('on');
     ptr.tcx = ptr.tcy = ptr.cx = ptr.cy = 0;
+    ptr.drag = 0;
+    paintStars();
   }
   function unpinFinalStates() {
+    skyStart();
     lastDraw = -1;
     stepEls.forEach(s => { s._on = undefined; });
     drawSteps();

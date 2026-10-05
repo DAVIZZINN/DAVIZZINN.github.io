@@ -77,6 +77,12 @@
     <circle cx="300" cy="300" r="300" fill="#0066FF"/>
     <g fill="#05070D"><path d="M100 140 245 86 238 410 262 412 260 498 82 486Z"/><path d="M262 108 448 46 505 96 508 372 452 428 258 455 256 410 398 400 400 140 292 148 290 186 266 190Z"/></g>
   </symbol>
+  <symbol id="arrow" viewBox="0 0 24 24">
+    <path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="close" viewBox="0 0 24 24">
+    <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
   <symbol id="check" viewBox="0 0 24 24">
     <path d="M5.5 12.5l4 4L18.5 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
@@ -94,6 +100,7 @@
   <div class="stars s-far"><i class="st a"></i><i class="st b"></i></div>
   <div class="stars s-mid"><i class="st a"></i><i class="st b"></i></div>
   <div class="stars s-near"><i class="st a"></i><i class="st b"></i><i class="st streak"></i></div>
+  <canvas class="sky" id="skycv"></canvas>
   <i class="meteor" id="meteor"></i>
   <div class="amb-spot" id="spot"></div>
   <div class="horizon" id="horizon"></div>
@@ -311,7 +318,7 @@
     </div>
     <div class="works-grid">
       <article class="work rv-group" data-depth="0.03">
-        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>brasaburger.com.br</span></div><div class="ms-view" data-ms="restaurante" data-style="escuro"></div></div></div>
+        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>brasaburger.com.br</span></div><div class="ms-view" data-ms="restaurante" data-style="escuro"></div></div><button class="work-open" type="button" aria-haspopup="dialog" data-open="restaurante">Ver projeto<svg class="ico" aria-hidden="true"><use href="#arrow"/></svg><span class="sr"> Brasa Burger</span></button></div>
         <div class="work-meta rv">
           <p class="tag">Conceito · Restaurante</p>
           <h3>Brasa Burger</h3>
@@ -319,7 +326,7 @@
         </div>
       </article>
       <article class="work rv-group" data-depth="0.08">
-        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>studioiris.com.br</span></div><div class="ms-view" data-ms="beleza" data-style="claro"></div></div></div>
+        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>studioiris.com.br</span></div><div class="ms-view" data-ms="beleza" data-style="claro"></div></div><button class="work-open" type="button" aria-haspopup="dialog" data-open="beleza">Ver projeto<svg class="ico" aria-hidden="true"><use href="#arrow"/></svg><span class="sr"> Studio Íris</span></button></div>
         <div class="work-meta rv">
           <p class="tag">Conceito · Salão de beleza</p>
           <h3>Studio Íris</h3>
@@ -327,7 +334,7 @@
         </div>
       </article>
       <article class="work rv-group" data-depth="0.03">
-        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>rafamoura.com.br</span></div><div class="ms-view" data-ms="profissional" data-style="vibrante"></div></div></div>
+        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>rafamoura.com.br</span></div><div class="ms-view" data-ms="profissional" data-style="vibrante"></div></div><button class="work-open" type="button" aria-haspopup="dialog" data-open="profissional">Ver projeto<svg class="ico" aria-hidden="true"><use href="#arrow"/></svg><span class="sr"> Rafa Moura Personal</span></button></div>
         <div class="work-meta rv">
           <p class="tag">Conceito · Profissional autônomo</p>
           <h3>Rafa Moura Personal</h3>
@@ -335,7 +342,7 @@
         </div>
       </article>
       <article class="work rv-group" data-depth="0.08">
-        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>ventostore.com.br</span></div><div class="ms-view" data-ms="loja" data-style="claro"></div></div></div>
+        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>ventostore.com.br</span></div><div class="ms-view" data-ms="loja" data-style="claro"></div></div><button class="work-open" type="button" aria-haspopup="dialog" data-open="loja">Ver projeto<svg class="ico" aria-hidden="true"><use href="#arrow"/></svg><span class="sr"> Vento</span></button></div>
         <div class="work-meta rv">
           <p class="tag">Conceito · Loja de roupas</p>
           <h3>Vento</h3>
@@ -555,6 +562,22 @@
     </div>
   </div>
 </footer>
+
+<div class="pm" id="pm" role="dialog" aria-modal="true" aria-labelledby="pm-title">
+  <div class="pm-backdrop" data-close></div>
+  <div class="pm-panel" id="pm-panel">
+    <button class="pm-close" type="button" data-close aria-label="Fechar projeto"><svg aria-hidden="true"><use href="#close"/></svg></button>
+    <div class="pm-view frame" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span id="pm-url"></span></div><div class="ms-view" id="pm-ms"></div></div>
+    <div class="pm-info">
+      <p class="tag" id="pm-tag"></p>
+      <h3 id="pm-title"></h3>
+      <p class="pm-desc" id="pm-desc"></p>
+      <ul class="pm-list" id="pm-list"></ul>
+      <p class="pm-pack" id="pm-pack"></p>
+      <a class="btn magnet" id="pm-cta" href="https://wa.me/5517996604865" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#wa"/></svg>Quero um site assim</a>
+    </div>
+  </div>
+</div>
 
 <script src="assets/site.js" defer></script>
 </body>
