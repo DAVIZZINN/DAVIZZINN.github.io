@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>David Dev · Criação de sites para comércios e pessoas em SP</title>
+<meta name="description" content="Criação de sites rápidos e feitos para o celular, para comércios e profissionais. Prazo por escrito, metade na entrega. Orçamento pelo WhatsApp.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="David Dev">
+<meta name="theme-color" content="#05070E">
+<link rel="canonical" href="https://davizzinn.github.io/">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="David Dev">
+<meta property="og:title" content="David Dev · Criação de sites para comércios e pessoas">
+<meta property="og:description" content="Eu construo o seu site, camada por camada. Prazo por escrito, metade na entrega.">
+<!-- DEPLOY STEP: URLs absolutas do site no ar (GitHub Pages) -->
+<meta property="og:url" content="https://davizzinn.github.io/">
+<meta property="og:image" content="https://davizzinn.github.io/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="David Dev: eu construo o seu site, camada por camada.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://davizzinn.github.io/#site",
+      "url": "https://davizzinn.github.io/",
+      "name": "David Dev",
+      "inLanguage": "pt-BR"
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": "https://davizzinn.github.io/#negocio",
+      "name": "David Dev",
+      "description": "Criação de sites para comércios e pessoas: página única, site completo, site animado e loja.",
+      "url": "https://davizzinn.github.io/",
+      "image": "https://davizzinn.github.io/assets/og.jpg",
+      "logo": "https://davizzinn.github.io/assets/icon-192.png",
+      "telephone": "+55 17 99660-4865",
+      "priceRange": "R$ 300 a R$ 9.000+",
+      "address": { "@type": "PostalAddress", "addressRegion": "SP", "addressCountry": "BR" },
+      "areaServed": [{ "@type": "State", "name": "São Paulo" }, { "@type": "Country", "name": "Brasil" }],
+      "sameAs": ["https://instagram.com/david._developer"],
+      "founder": { "@type": "Person", "name": "David", "jobTitle": "Desenvolvedor de sites" },
+      "makesOffer": [
+        { "@type": "Offer", "name": "Página única", "priceSpecification": { "@type": "PriceSpecification", "minPrice": 300, "priceCurrency": "BRL" } },
+        { "@type": "Offer", "name": "Site completo", "priceSpecification": { "@type": "PriceSpecification", "minPrice": 1200, "priceCurrency": "BRL" } },
+        { "@type": "Offer", "name": "Site animado ou loja", "priceSpecification": { "@type": "PriceSpecification", "minPrice": 4000, "priceCurrency": "BRL" } }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=JetBrains+Mono:wght@500&family=Unbounded:wght@500;700&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<a class="skip" href="#main">Pular para o conteúdo</a>
+
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="plate" viewBox="0 0 48 28">
+    <polygon points="24,0 48,12 24,24 0,12" style="fill:var(--pf,#131C33);stroke:var(--ps,#5B6A8C)" stroke-width="1" stroke-linejoin="round"/>
+    <polygon points="0,12 24,24 24,28 0,16" style="fill:var(--pl,#0A1020);stroke:var(--ps,#5B6A8C)" stroke-width="1" stroke-linejoin="round"/>
+    <polygon points="24,24 48,12 48,16 24,28" style="fill:var(--pr,#0C1326);stroke:var(--ps,#5B6A8C)" stroke-width="1" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="logo" viewBox="0 0 600 600">
+    <circle cx="300" cy="300" r="300" fill="#0066FF"/>
+    <g fill="#05070D"><path d="M100 140 245 86 238 410 262 412 260 498 82 486Z"/><path d="M262 108 448 46 505 96 508 372 452 428 258 455 256 410 398 400 400 140 292 148 290 186 266 190Z"/></g>
+  </symbol>
+  <symbol id="check" viewBox="0 0 24 24">
+    <path d="M5.5 12.5l4 4L18.5 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="wa" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/>
+  </symbol>
+</svg>
+
+<div class="ambient" aria-hidden="true">
+  <div class="aur aur-a"></div>
+  <div class="aur aur-b"></div>
+  <div class="aur aur-c"></div>
+  <div class="aur aur-d"></div>
+  <div class="galaxy" id="galaxy"><i class="gx-glow"></i><i class="gx-dust"></i></div>
+  <div class="stars s-far"><i class="st a"></i><i class="st b"></i></div>
+  <div class="stars s-mid"><i class="st a"></i><i class="st b"></i></div>
+  <div class="stars s-near"><i class="st a"></i><i class="st b"></i><i class="st streak"></i></div>
+  <i class="meteor" id="meteor"></i>
+  <div class="amb-spot" id="spot"></div>
+  <div class="horizon" id="horizon"></div>
+  <div class="amb-vignette"></div>
+  <div class="amb-grain"></div>
+</div>
+
+<header class="nav" id="nav">
+  <nav class="nav-in" aria-label="Principal">
+    <a class="brand" href="#topo" aria-label="David Dev, início">
+      <svg class="brand-logo" aria-hidden="true"><use href="#logo"/></svg>
+      <span class="brand-name">David Dev</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#trabalhos">Trabalhos</a></li>
+      <li><a href="#como-funciona">Como funciona</a></li>
+      <li><a href="#precos">Preços</a></li>
+      <li><a href="#duvidas">Dúvidas</a></li>
+    </ul>
+    <span class="status"><i class="dot" aria-hidden="true"></i>Aberto para projetos</span>
+    <a class="btn btn-sm magnet" href="https://wa.me/5517996604865" data-wa="Oi David! Vi seu portfólio e quero fazer um site." target="_blank" rel="noopener">
+      <svg class="ico" aria-hidden="true"><use href="#wa"/></svg>WhatsApp
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu"><i></i><i></i></button>
+  </nav>
+  <div class="menu" id="menu">
+    <ul>
+      <li><a href="#trabalhos">Trabalhos</a></li>
+      <li><a href="#como-funciona">Como funciona</a></li>
+      <li><a href="#monte">Monte o seu</a></li>
+      <li><a href="#precos">Preços</a></li>
+      <li><a href="#duvidas">Dúvidas</a></li>
+    </ul>
+    <p class="menu-status"><i class="dot" aria-hidden="true"></i>Aberto para projetos</p>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+<section class="hero" id="topo" aria-label="Apresentação">
+  <div class="stage">
+    <div class="scene" aria-hidden="true" inert>
+      <div class="float">
+        <div class="stack" id="stack">
+
+          <div class="layer l-code" data-i="0">
+            <div class="plate">
+              <div class="code">
+                <span class="cl" style="--i:0"><em>01</em><u>&lt;header</u> <s>class</s>=<q>"topo"</q><u>&gt;</u></span>
+                <span class="cl" style="--i:1"><em>02</em>  <u>&lt;a</u> <s>class</s>=<q>"marca"</q><u>&gt;</u>Seu Negócio<u>&lt;/a&gt;</u></span>
+                <span class="cl" style="--i:2"><em>03</em>  <u>&lt;a</u> <s>href</s>=<q>"wa.me/55..."</q><u>&gt;</u>Pedir<u>&lt;/a&gt;</u></span>
+                <span class="cl" style="--i:3"><em>04</em><u>&lt;/header&gt;</u></span>
+                <span class="cl" style="--i:4"><em>05</em><u>&lt;section</u> <s>class</s>=<q>"hero"</q><u>&gt;</u></span>
+                <span class="cl" style="--i:5"><em>06</em>  <u>&lt;h1&gt;</u>Fácil de achar.<u>&lt;/h1&gt;</u></span>
+                <span class="cl" style="--i:6"><em>07</em>  <u>&lt;p&gt;</u>Aberto hoje até 22h<u>&lt;/p&gt;</u></span>
+                <span class="cl" style="--i:7"><em>08</em><u>&lt;/section&gt;</u></span>
+                <span class="cl" style="--i:8"><em>09</em><b>.hero</b> { <s>display</s>: grid; }<i class="caret"></i></span>
+              </div>
+            </div>
+            <div class="anno"><span>01</span> código</div>
+          </div>
+
+          <div class="layer l-wire" data-i="1">
+            <div class="plate">
+              <i class="wb wb-nav"></i><i class="wb wb-logo"></i><i class="wb wb-links"></i><i class="wb wb-btn"></i>
+              <i class="wb wb-kick"></i><i class="wb wb-h"></i><i class="wb wb-p"></i><i class="wb wb-cta"></i>
+              <i class="wb wb-art"><svg viewBox="0 0 10 10" preserveAspectRatio="none"><path d="M0 0 10 10M10 0 0 10" vector-effect="non-scaling-stroke"/></svg></i>
+              <i class="wb wb-c1"></i><i class="wb wb-c2"></i><i class="wb wb-c3"></i>
+              <span class="dim dim-w">1280</span><span class="dim dim-h">grid 12</span>
+            </div>
+            <div class="anno"><span>02</span> estrutura</div>
+          </div>
+
+          <div class="layer l-design" data-i="2">
+            <div class="plate">
+              <i class="db db-logo"></i><i class="db db-btn"></i>
+              <i class="db db-h"></i><i class="db db-h2"></i><i class="db db-cta"></i>
+              <i class="db db-art"></i>
+              <i class="db db-c1"></i><i class="db db-c2"></i><i class="db db-c3"></i>
+              <span class="swatches"><i></i><i></i><i></i><i></i></span>
+              <span class="aa">Aa</span>
+            </div>
+            <div class="anno"><span>03</span> design</div>
+          </div>
+
+          <div class="layer l-content" data-i="3">
+            <div class="plate">
+              <div class="chrome"><i></i><i></i><i></i><span class="url">seunegocio.com.br</span><span class="onair"><b></b>no ar</span></div>
+              <div class="cs">
+                <span class="cs-logo"><b></b>Seu Negócio</span>
+                <span class="cs-links"><i>Cardápio</i><i>Sobre</i><i>Contato</i></span>
+                <span class="cs-btn">Pedir agora</span>
+                <span class="cs-kick">Aberto hoje até 22h</span>
+                <span class="cs-h">Fácil de achar. Fácil de pedir.</span>
+                <span class="cs-p">Cardápio, horários e pedido em um toque pelo WhatsApp.</span>
+                <span class="cs-cta">Chamar no WhatsApp</span>
+                <span class="cs-art">
+                  <svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice">
+                    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3D7BFF"/><stop offset="1" stop-color="#9FC2FF"/></linearGradient></defs>
+                    <rect width="200" height="140" fill="url(#sky)"/>
+                    <circle cx="156" cy="34" r="16" fill="#FFE29A"/>
+                    <rect x="34" y="52" width="132" height="88" fill="#F4F6FB"/>
+                    <path d="M28 52h144l-8 18H36Z" fill="#1B6BFF"/>
+                    <path d="M44 52h12l-2 18h-12ZM68 52h12l-1 18H67ZM92 52h12v18H92ZM116 52h12l1 18h-12ZM140 52h12l2 18h-12Z" fill="#F4F6FB"/>
+                    <rect x="48" y="84" width="40" height="56" rx="2" fill="#0E1527"/>
+                    <rect x="100" y="84" width="54" height="34" rx="2" fill="#CFE0FF"/>
+                    <rect x="0" y="134" width="200" height="6" fill="#0E1527" opacity=".25"/>
+                  </svg>
+                </span>
+                <span class="cs-card c1"><i></i><b>Cardápio</b><em>Veja os pratos</em></span>
+                <span class="cs-card c2"><i></i><b>Como chegar</b><em>Rua das Flores, 120</em></span>
+                <span class="cs-card c3"><i></i><b>Horários</b><em>Ter a dom, 18h às 23h</em></span>
+              </div>
+            </div>
+            <div class="anno"><span>04</span> conteúdo</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="scrim" aria-hidden="true"></div>
+
+    <div class="bands" id="bands">
+      <div class="band fx-scatter" data-a="0" data-b="0.17" data-spread="0.5">
+        <p class="kick">David Dev · desenvolvedor de sites · SP</p>
+        <h1 class="t">Eu construo o seu site, camada por camada.</h1>
+        <p class="s">Para comércios e pessoas que querem ser encontrados. Role e veja como é feito.</p>
+      </div>
+      <div class="band fx-grid" data-a="0.20" data-b="0.37" data-spread="0.5">
+        <p class="kick">camada 01 · código</p>
+        <p class="t">Primeiro, o código.</p>
+        <p class="s">Escrito à mão, sem gambiarra. Leve para abrir rápido até no 4G.</p>
+      </div>
+      <div class="band fx-drift" data-a="0.40" data-b="0.57">
+        <p class="kick">camadas 02 e 03 · estrutura e design</p>
+        <p class="t">Depois, a estrutura e a cara da sua marca.</p>
+        <p class="s">Cada coisa no lugar certo, com as suas cores. Pensado primeiro para o celular, porque é lá que seu cliente está.</p>
+      </div>
+      <div class="band fx-punch" data-a="0.60" data-b="0.77">
+        <p class="kick">camada 04 · conteúdo</p>
+        <p class="t" data-em="vende.">Por fim, o conteúdo que vende.</p>
+        <p class="s">Texto claro, fotos boas e um botão direto para o seu WhatsApp.</p>
+      </div>
+      <div class="band fx-rise" data-a="0.81" data-b="1">
+        <p class="kick"><i class="dot" aria-hidden="true"></i>no ar</p>
+        <p class="t">No ar. E pronto para o Google.</p>
+        <p class="s">Domínio, celular e Google resolvidos. Você só aprova.</p>
+        <p class="cta-row">
+          <a class="btn magnet" href="https://wa.me/5517996604865" data-wa="Oi David! Vi seu portfólio e quero fazer um site." target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#wa"/></svg>Quero meu site</a>
+          <a class="btn btn-ghost" href="#trabalhos">Ver trabalhos</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="static-copy">
+      <p class="kick">David Dev · desenvolvedor de sites · SP</p>
+      <h1 class="t">Eu construo o seu site, camada por camada.</h1>
+      <p class="s">Sites rápidos, bonitos e feitos para o celular, para comércios e pessoas que querem ser encontrados.</p>
+      <p class="cta-row">
+        <a class="btn magnet" href="https://wa.me/5517996604865" data-wa="Oi David! Vi seu portfólio e quero fazer um site." target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#wa"/></svg>Quero meu site</a>
+        <a class="btn btn-ghost" href="#trabalhos">Ver trabalhos</a>
+      </p>
+    </div>
+
+    <div class="hud chip" aria-hidden="true">
+      <span class="hud-ticks"><i></i><i></i><i></i><i></i></span>
+      <span class="hud-t">camadas <b id="hudN">0</b>/4</span>
+    </div>
+    <div class="cue" aria-hidden="true"><span>role para montar</span><i></i></div>
+  </div>
+</section>
+
+<section class="sec why" id="por-que" aria-labelledby="why-h">
+  <div class="wrap why-grid">
+    <div class="why-copy rv-group" data-depth="0.05">
+      <p class="kick rv">Por que eu</p>
+      <h2 id="why-h" class="h2 rv-words">Você já ouviu essa história.</h2>
+      <p class="lede rv">Dev que some, prazo que estoura, site que quebra no celular. Comigo, cada uma dessas coisas tem resposta.</p>
+    </div>
+    <div class="cmp spot rv-group" data-depth="-0.04">
+      <div class="cmp-head rv" aria-hidden="true"><span class="h-old">O que costuma acontecer</span><span class="h-new">Comigo é assim</span></div>
+      <ul class="cmp-list" aria-label="O que muda trabalhando comigo">
+        <li class="cmp-row rv">
+          <p class="old"><span class="sr">O que costuma acontecer: </span><span class="strk">Prometeram 15 dias. Passaram 2 meses.</span></p>
+          <span class="arrow" aria-hidden="true"></span>
+          <p class="new"><span class="ok" aria-hidden="true"><svg><use href="#check"/></svg></span><span class="sr">Comigo: </span><span class="sweep">Prazo por escrito na proposta, antes de começar.</span></p>
+        </li>
+        <li class="cmp-row rv">
+          <p class="old"><span class="sr">O que costuma acontecer: </span><span class="strk">Pagou adiantado e o cara sumiu.</span></p>
+          <span class="arrow" aria-hidden="true"></span>
+          <p class="new"><span class="ok" aria-hidden="true"><svg><use href="#check"/></svg></span><span class="sr">Comigo: </span><span class="sweep">Metade para começar. A outra metade só na entrega.</span></p>
+        </li>
+        <li class="cmp-row rv">
+          <p class="old"><span class="sr">O que costuma acontecer: </span><span class="strk">Ninguém mostra nada até o fim.</span></p>
+          <span class="arrow" aria-hidden="true"></span>
+          <p class="new"><span class="ok" aria-hidden="true"><svg><use href="#check"/></svg></span><span class="sr">Comigo: </span><span class="sweep">Link de prévia: você vê o site crescer e pede ajuste.</span></p>
+        </li>
+        <li class="cmp-row rv">
+          <p class="old"><span class="sr">O que costuma acontecer: </span><span class="strk">No celular, tudo quebrado.</span></p>
+          <span class="arrow" aria-hidden="true"></span>
+          <p class="new"><span class="ok" aria-hidden="true"><svg><use href="#check"/></svg></span><span class="sr">Comigo: </span><span class="sweep">Feito primeiro para o celular e testado no seu.</span></p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec works" id="trabalhos" aria-labelledby="works-h">
+  <div class="wrap">
+    <div class="sec-head rv-group" data-depth="0.06">
+      <p class="kick rv">Trabalhos</p>
+      <h2 id="works-h" class="h2 rv-words">Quatro ideias prontas para virar o seu site.</h2>
+      <p class="lede rv">Projetos conceito que eu fiz para mostrar o que dá para construir. Os nomes são fictícios. <span class="hint-fine">Passe o mouse para ver cada um rolando.</span><span class="hint-touch">Cada um rola sozinho para você ver a página inteira.</span></p>
+    </div>
+    <div class="works-grid">
+      <article class="work rv-group" data-depth="0.03">
+        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>brasaburger.com.br</span></div><div class="ms-view" data-ms="restaurante" data-style="escuro"></div></div></div>
+        <div class="work-meta rv">
+          <p class="tag">Conceito · Restaurante</p>
+          <h3>Brasa Burger</h3>
+          <p>Cardápio, pedido pelo WhatsApp e horários.</p>
+        </div>
+      </article>
+      <article class="work rv-group" data-depth="0.08">
+        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>studioiris.com.br</span></div><div class="ms-view" data-ms="beleza" data-style="claro"></div></div></div>
+        <div class="work-meta rv">
+          <p class="tag">Conceito · Salão de beleza</p>
+          <h3>Studio Íris</h3>
+          <p>Serviços com preço e agendamento pelo WhatsApp.</p>
+        </div>
+      </article>
+      <article class="work rv-group" data-depth="0.03">
+        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>rafamoura.com.br</span></div><div class="ms-view" data-ms="profissional" data-style="vibrante"></div></div></div>
+        <div class="work-meta rv">
+          <p class="tag">Conceito · Profissional autônomo</p>
+          <h3>Rafa Moura Personal</h3>
+          <p>Apresentação, planos e primeira avaliação.</p>
+        </div>
+      </article>
+      <article class="work rv-group" data-depth="0.08">
+        <div class="tilt"><div class="frame spot rv" aria-hidden="true"><div class="frame-bar"><i></i><i></i><i></i><span>ventostore.com.br</span></div><div class="ms-view" data-ms="loja" data-style="claro"></div></div></div>
+        <div class="work-meta rv">
+          <p class="tag">Conceito · Loja de roupas</p>
+          <h3>Vento</h3>
+          <p>Coleção, preços e retirada na loja.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec steps-sec" id="como-funciona" aria-labelledby="steps-h">
+  <div class="wrap">
+    <div class="sec-head center rv-group" data-depth="0.06">
+      <p class="kick rv">Como funciona</p>
+      <h2 id="steps-h" class="h2 rv-words">Quatro etapas. Você acompanha todas.</h2>
+    </div>
+    <div class="steps-wrap" id="steps">
+    <div class="track" aria-hidden="true"><i class="track-line"></i></div>
+    <ol class="steps">
+      <li class="step" data-at="0.06">
+        <svg class="plates" viewBox="0 0 48 60" aria-hidden="true"><use href="#plate" class="pt top" y="30" width="48" height="28"/></svg>
+        <span class="num">01</span>
+        <h3>Conversa</h3>
+        <p>A gente conversa no WhatsApp. Você conta do seu negócio e eu faço as perguntas certas.</p>
+      </li>
+      <li class="step" data-at="0.36">
+        <svg class="plates" viewBox="0 0 48 60" aria-hidden="true"><use href="#plate" class="pt" y="30" width="48" height="28"/><use href="#plate" class="pt top" y="22" width="48" height="28"/></svg>
+        <span class="num">02</span>
+        <h3>Proposta</h3>
+        <p>Você recebe por escrito o que o site vai ter, o prazo e o preço. Sem surpresa.</p>
+      </li>
+      <li class="step" data-at="0.64">
+        <svg class="plates" viewBox="0 0 48 60" aria-hidden="true"><use href="#plate" class="pt" y="30" width="48" height="28"/><use href="#plate" class="pt" y="22" width="48" height="28"/><use href="#plate" class="pt top" y="14" width="48" height="28"/></svg>
+        <span class="num">03</span>
+        <h3>Construção</h3>
+        <p>Eu construo e te mando um link de prévia. Você vê o site crescer e pede ajustes.</p>
+      </li>
+      <li class="step" data-at="0.92">
+        <svg class="plates" viewBox="0 0 48 60" aria-hidden="true"><use href="#plate" class="pt" y="30" width="48" height="28"/><use href="#plate" class="pt" y="22" width="48" height="28"/><use href="#plate" class="pt" y="14" width="48" height="28"/><use href="#plate" class="pt top" y="6" width="48" height="28"/></svg>
+        <span class="num">04</span>
+        <h3>No ar</h3>
+        <p>Site publicado no seu domínio e testado no celular. Aí você paga a segunda metade.</p>
+      </li>
+    </ol>
+    </div>
+  </div>
+</section>
+
+<section class="sec build" id="monte" aria-labelledby="build-h">
+  <div class="wrap build-grid">
+    <div class="build-controls rv-group">
+      <p class="kick rv">Monte o seu</p>
+      <h2 id="build-h" class="h2 rv-words">Monte o seu em dez segundos.</h2>
+      <p class="lede rv">Escolha o tipo de negócio, o estilo e o que não pode faltar. As camadas se encaixam na hora.</p>
+      <form class="cfg rv" id="cfg" aria-describedby="cfg-out">
+        <fieldset>
+          <legend>Negócio</legend>
+          <div class="chips">
+            <label><input type="radio" name="biz" value="restaurante" checked><span>Restaurante</span></label>
+            <label><input type="radio" name="biz" value="beleza"><span>Beleza</span></label>
+            <label><input type="radio" name="biz" value="profissional"><span>Profissional</span></label>
+            <label><input type="radio" name="biz" value="loja"><span>Loja</span></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Estilo</legend>
+          <div class="chips">
+            <label><input type="radio" name="estilo" value="escuro" checked><span>Escuro</span></label>
+            <label><input type="radio" name="estilo" value="claro"><span>Claro</span></label>
+            <label><input type="radio" name="estilo" value="vibrante"><span>Vibrante</span></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Não pode faltar</legend>
+          <div class="chips">
+            <label><input type="checkbox" name="x" value="items" checked><span>Cardápio ou catálogo</span></label>
+            <label><input type="checkbox" name="x" value="gallery"><span>Galeria de fotos</span></label>
+            <label><input type="checkbox" name="x" value="map"><span>Mapa e horários</span></label>
+            <label><input type="checkbox" name="x" value="anim"><span>Animações no scroll</span></label>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div class="build-out rv-group" data-depth="-0.03">
+      <div class="preview rv" aria-hidden="true">
+        <div class="frame spot"><div class="frame-bar"><i></i><i></i><i></i><span id="pv-url">seunegocio.com.br</span></div>
+          <div class="pv-body">
+            <div class="ms-view" id="pv" data-ms="restaurante" data-style="escuro"></div>
+            <div class="sheet sh-code"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="sheet sh-wire"><i></i><i></i><i></i><i></i></div>
+            <div class="sheet sh-design"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="cfg-out rv" id="cfg-out" aria-live="polite">
+        <p class="pk-line">Seu site: <b id="pk-name">Página única</b>, a partir de <b id="pk-price">R$&nbsp;300</b>.</p>
+        <p class="pk-note">O valor final vem por escrito na proposta.</p>
+        <a class="btn magnet" id="pk-send" href="https://wa.me/5517996604865" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#wa"/></svg>Mandar essa ideia no WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec prices" id="precos" aria-labelledby="prices-h">
+  <div class="wrap">
+    <div class="sec-head rv-group" data-depth="0.06">
+      <p class="kick rv">Preços</p>
+      <h2 id="prices-h" class="h2 rv-words">Preço claro desde a primeira conversa.</h2>
+    </div>
+    <div class="tiers">
+      <article class="tier spot spot-fill tilt rv-group">
+        <svg class="plates rv" viewBox="0 0 48 60" aria-hidden="true"><use href="#plate" class="pt top" y="30" width="48" height="28"/></svg>
+        <h3 class="rv">Página única</h3>
+        <p class="price rv"><span>a partir de</span> R$&nbsp;300</p>
+        <p class="desc rv">Uma página com tudo que seu cliente precisa: quem você é, o que faz, onde fica e o botão do WhatsApp.</p>
+        <ul class="rv"><li>Feita para celular</li><li>Botão de WhatsApp</li><li>Mapa e horários</li><li>Pronta em poucos dias</li></ul>
+        <div class="tier-cta rv"><a class="btn btn-ghost" href="https://wa.me/5517996604865" data-wa="Oi David! Vi o pacote Página única no seu site e quero um orçamento." target="_blank" rel="noopener">Quero esse</a></div>
+      </article>
+      <article class="tier tier-hi spot spot-fill tilt rv-group">
+        <i class="tier-glow" aria-hidden="true"></i>
+        <svg class="plates rv" viewBox="0 0 48 60" aria-hidden="true"><use href="#plate" class="pt" y="30" width="48" height="28"/><use href="#plate" class="pt" y="22" width="48" height="28"/><use href="#plate" class="pt top" y="14" width="48" height="28"/></svg>
+        <h3 class="rv">Site completo</h3>
+        <p class="price rv"><span>a partir de</span> R$&nbsp;1.200</p>
+        <p class="desc rv">Para o negócio que quer passar confiança e ser achado no Google.</p>
+        <ul class="rv"><li>Várias seções ou páginas</li><li>Cardápio, catálogo ou serviços</li><li>Galeria de fotos</li><li>Pronto para o Google</li></ul>
+        <div class="tier-cta rv"><a class="btn" href="https://wa.me/5517996604865" data-wa="Oi David! Vi o pacote Site completo no seu site e quero um orçamento." target="_blank" rel="noopener">Quero esse</a></div>
+      </article>
+      <article class="tier spot spot-fill tilt rv-group">
+        <svg class="plates rv" viewBox="0 0 48 60" aria-hidden="true"><use href="#plate" class="pt" y="30" width="48" height="28"/><use href="#plate" class="pt" y="22" width="48" height="28"/><use href="#plate" class="pt" y="14" width="48" height="28"/><use href="#plate" class="pt top" y="6" width="48" height="28"/></svg>
+        <h3 class="rv">Site animado ou loja</h3>
+        <p class="price rv"><span>a partir de</span> R$&nbsp;4.000</p>
+        <p class="desc rv">Uma experiência que as pessoas lembram, como este site. Ou uma loja para vender online.</p>
+        <ul class="rv"><li>Animações sob medida</li><li>Visual forte e único</li><li>Loja ou catálogo grande</li></ul>
+        <div class="tier-cta rv"><a class="btn btn-ghost" href="https://wa.me/5517996604865" data-wa="Oi David! Vi o pacote Site animado ou loja no seu site e quero um orçamento." target="_blank" rel="noopener">Quero esse</a></div>
+      </article>
+    </div>
+    <p class="tiers-note rv">Projetos maiores vão até R$&nbsp;9.000 ou mais. Pagamento: metade para começar, metade na entrega. Prazo por escrito na proposta.</p>
+  </div>
+</section>
+
+<section class="sec faq" id="duvidas" aria-labelledby="faq-h">
+  <div class="wrap faq-grid">
+    <div class="faq-side rv-group">
+      <p class="kick rv">Dúvidas</p>
+      <h2 id="faq-h" class="h2 rv-words">As perguntas que todo mundo faz.</h2>
+      <p class="lede rv">Não achou a sua? <a href="https://wa.me/5517996604865" data-wa="Oi David! Tenho uma dúvida sobre fazer um site." target="_blank" rel="noopener">Me pergunta no WhatsApp.</a></p>
+    </div>
+    <div class="qa-list rv-group">
+      <div class="qa rv"><h3><button type="button" aria-expanded="false" aria-controls="qa1" id="qb1">Já tenho Instagram. Preciso mesmo de um site?<i aria-hidden="true"></i></button></h3><div class="qa-a" id="qa1" role="region" aria-labelledby="qb1"><div><p>O Instagram mostra, o site convence. Quando alguém procura seu serviço no Google, quem aparece é o site. E ele é seu, não depende do algoritmo.</p></div></div></div>
+      <div class="qa rv"><h3><button type="button" aria-expanded="false" aria-controls="qa2" id="qb2">Quanto tempo demora?<i aria-hidden="true"></i></button></h3><div class="qa-a" id="qa2" role="region" aria-labelledby="qb2"><div><p>Depende do tamanho do projeto. O prazo vem escrito na proposta, antes de você pagar qualquer coisa, e você acompanha tudo por um link de prévia.</p></div></div></div>
+      <div class="qa rv"><h3><button type="button" aria-expanded="false" aria-controls="qa3" id="qb3">Preciso pagar tudo antes?<i aria-hidden="true"></i></button></h3><div class="qa-a" id="qa3" role="region" aria-labelledby="qb3"><div><p>Não. Metade para começar e metade só quando o site estiver no ar e aprovado por você.</p></div></div></div>
+      <div class="qa rv"><h3><button type="button" aria-expanded="false" aria-controls="qa4" id="qb4">Vai funcionar no celular?<i aria-hidden="true"></i></button></h3><div class="qa-a" id="qa4" role="region" aria-labelledby="qb4"><div><p>Vai. Eu desenho primeiro para o celular, porque é lá que seu cliente está, e testo em tela de verdade antes de entregar.</p></div></div></div>
+      <div class="qa rv"><h3><button type="button" aria-expanded="false" aria-controls="qa5" id="qb5">Meu site vai aparecer no Google?<i aria-hidden="true"></i></button></h3><div class="qa-a" id="qa5" role="region" aria-labelledby="qb5"><div><p>Ele sai pronto para o Google: rápido, com título, descrição e endereço certos. Chegar no topo leva tempo, e eu te explico o que ajuda.</p></div></div></div>
+      <div class="qa rv"><h3><button type="button" aria-expanded="false" aria-controls="qa6" id="qb6">E se eu quiser mudar algo depois?<i aria-hidden="true"></i></button></h3><div class="qa-a" id="qa6" role="region" aria-labelledby="qb6"><div><p>Me chama no WhatsApp. Ajuste pequeno é rápido. Mudança grande vira um orçamento novo, combinado antes.</p></div></div></div>
+      <div class="qa rv"><h3><button type="button" aria-expanded="false" aria-controls="qa7" id="qb7">Domínio e hospedagem, como fica?<i aria-hidden="true"></i></button></h3><div class="qa-a" id="qa7" role="region" aria-labelledby="qb7"><div><p>Ficam no seu nome e você paga direto para a empresa. Eu te ajudo a escolher e configuro tudo.</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec final" id="contato" aria-labelledby="final-h">
+  <div class="wrap final-grid">
+    <div class="final-art" aria-hidden="true" data-depth="0.1">
+      <svg viewBox="0 0 220 222" class="final-stack">
+        <g class="ghost"><use href="#plate" x="70" y="4" width="144" height="84"/></g>
+        <use href="#plate" class="pt" x="70" y="132" width="144" height="84"/>
+        <use href="#plate" class="pt" x="70" y="108" width="144" height="84"/>
+        <use href="#plate" class="pt" x="70" y="84" width="144" height="84"/>
+        <use href="#plate" class="pt top" x="70" y="60" width="144" height="84"/>
+        <g class="leads"><path d="M58 40h10M58 96h10M58 120h10M58 144h10M58 168h10"/></g>
+        <g class="labels"><text class="gl" x="54" y="43">sua ideia</text><text x="54" y="99">conteúdo</text><text x="54" y="123">design</text><text x="54" y="147">estrutura</text><text x="54" y="171">código</text></g>
+      </svg>
+    </div>
+    <div class="final-copy rv-group">
+      <p class="kick rv">Camada final</p>
+      <h2 id="final-h" class="h2 rv-words">Falta uma camada: a sua ideia.</h2>
+      <p class="lede rv">Me conta do seu negócio. Eu respondo rápido e te mando uma proposta por escrito.</p>
+      <form class="lead spot rv" id="lead" novalidate>
+        <div class="field">
+          <label for="f-nome">Seu nome</label>
+          <input id="f-nome" name="nome" type="text" autocomplete="given-name" placeholder="Como posso te chamar?" required>
+        </div>
+        <div class="field">
+          <label for="f-neg">Seu negócio</label>
+          <input id="f-neg" name="negocio" type="text" placeholder="Ex.: hamburgueria em Rio Preto" required>
+        </div>
+        <div class="field">
+          <label for="f-msg">O que você precisa</label>
+          <textarea id="f-msg" name="msg" rows="3" placeholder="Conta em poucas palavras. Pode ser simples."></textarea>
+        </div>
+        <p class="form-err" id="lead-err" role="alert" hidden>Preencha seu nome e seu negócio para eu saber com quem estou falando.</p>
+        <button class="btn btn-lg magnet" type="submit"><svg class="ico" aria-hidden="true"><use href="#wa"/></svg>Enviar pelo WhatsApp</button>
+        <p class="form-ok" id="lead-ok" role="status" hidden>Abrindo o seu WhatsApp com a mensagem pronta. É só apertar enviar. <a id="lead-link" href="https://wa.me/5517996604865" target="_blank" rel="noopener">Não abriu? Toque aqui.</a></p>
+      </form>
+      <p class="alt rv">Prefere o Instagram? <a href="https://instagram.com/david._developer" target="_blank" rel="noopener">@david._developer</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <svg class="brand-logo" aria-hidden="true"><use href="#logo"/></svg>
+      <div>
+        <p class="foot-name">David Dev</p>
+        <p>Desenvolvedor de sites · São Paulo, Brasil</p>
+      </div>
+    </div>
+    <ul class="foot-links">
+      <li><a href="https://wa.me/5517996604865" data-wa="Oi David! Vi seu portfólio e quero fazer um site." target="_blank" rel="noopener">WhatsApp (17) 99660-4865</a></li>
+      <li><a href="https://instagram.com/david._developer" target="_blank" rel="noopener">Instagram @david._developer</a></li>
+    </ul>
+    <div class="foot-notes">
+      <p>Os projetos da seção Trabalhos são conceitos com nomes fictícios.</p>
+      <p>Feito à mão por mim, sem template. © 2026 David Dev</p>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/site.js" defer></script>
+</body>
+</html>
